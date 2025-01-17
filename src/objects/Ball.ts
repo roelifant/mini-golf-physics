@@ -85,19 +85,8 @@ export class Ball implements IActiveGameObject {
             const negatedPosition = this.position.subtract(overlapVector);
             // calculate the difference (transformation) from current position to negated position
             const negatedDiff = negatedPosition.subtract(this.position);
-            // normalize to get the direction of that transformation
-            const negatedDirection = negatedDiff.normalize();
-            // get "face" we're bouncing off of as a line vector
-            const faceDirection = negatedDirection.perpendicular2D();
-            // get the direction the ball is currently moving in
-            const currentDirection = this.momentum.normalize();
-            // get the dot product times 2. Lord knows why we need this, but we do
-            const doubleDotProduct = faceDirection.dot(currentDirection) * 2;
-            // create the reflected vector direction
-            const reflectionVector = new Vector((faceDirection.x * doubleDotProduct) - currentDirection.x, (faceDirection.y * doubleDotProduct) - currentDirection.y);
-            
-            // set the momentum to this direction
-            this.momentum = reflectionVector.setLength(this.momentum.length);
+            // bounce the momentum off the line of the collision object
+            this.momentum = this.momentum.bounceOffLine(negatedDiff.perpendicular2D());
 
             // add extra drag
             // drag

@@ -816,4 +816,23 @@ export class Vector {
 
         return this.add(movementVector);
     }
+
+    /**
+     * Calculate what a direction vector would look like if it "bounced off" another line vector
+     * 
+     * @param lineVector 
+     * @returns vector
+     */
+    public bounceOffLine(lineVector: Vector): Vector {
+        // get the direction of the line we're bouncing off of
+        const lineDirection = lineVector.normalize();
+        // get the direction for this vector
+        const direction = this.normalize();
+        // get the dot product times 2. Lord knows why we need this, but we do
+        const doubleDotProduct = lineDirection.dot(direction) * 2;
+        // create the reflected vector direction
+        const reflectionVector = new Vector((lineDirection.x * doubleDotProduct) - direction.x, (lineDirection.y * doubleDotProduct) - direction.y);
+        // set the original length
+        return reflectionVector.setLength(this.length);
+    }
 }
