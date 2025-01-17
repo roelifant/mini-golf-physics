@@ -1,0 +1,21 @@
+{
+  "name": "mini-golf-physics",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "type-check": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "~5.6.2",
+    "vite": "^6.0.5"
+  },
+  "dependencies": {
+    "detect-collisions": "^9.24.0",
+    "pixi-viewport": "^6.0.3",
+    "pixi.js": "^8.6.6"
+  }
+}
