@@ -44,8 +44,14 @@ export class Wall implements IGameObject {
             const visual = (new Graphics())
             .circle(0, 0, circle.radius)
             .fill(0xffffff);
-            // visual.pivot.x = circle.radius/2;
-            // visual.pivot.y = circle.radius/2;
+            return visual;
+        }
+
+        if(shape.type === Shape.ELLIPSE) {
+            const ellipse = <IEllipse>shape;
+            const visual = (new Graphics())
+            .ellipse(0, 0, ellipse.radius.x, ellipse.radius.y)
+            .fill(0xffffff);
             return visual;
         }
 

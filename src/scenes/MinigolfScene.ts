@@ -5,7 +5,7 @@ import { Ball } from "../objects/Ball";
 import { Wall } from "../objects/Wall";
 import { Scene } from "../pixi/Scene";
 import { CollisionService } from "../services/CollisionService";
-import { ICircle, IRectangle, Shape } from "../contracts/Shapes";
+import { ICircle, IEllipse, IRectangle, Shape } from "../contracts/Shapes";
 
 export class MiniGolfScene extends Scene {
     public key = 'minigolf';
@@ -16,17 +16,25 @@ export class MiniGolfScene extends Scene {
 
         const horizontalWallShape = <IRectangle>{
             type: Shape.RECTANGLE,
-            width: 1000,
+            width: 1200,
             height: 100
         };
         const verticalWallShape = <IRectangle>{
             type: Shape.RECTANGLE,
             width: 100,
-            height: 1000
+            height: 900
         }
         const circleWallShape = <ICircle>{
             type: Shape.CIRCLE,
             radius: 50
+        }
+
+        const ellipseWallShape = <IEllipse>{
+            type: Shape.ELLIPSE,
+            radius: {
+                x: 30,
+                y: 80
+            }
         }
         
         this.addGameObjects([
@@ -40,10 +48,10 @@ export class MiniGolfScene extends Scene {
             new Wall(circleWallShape, new Vector(0, 200), this.randomSpin()),
             new Wall(circleWallShape, new Vector(0, -200), this.randomSpin()),
 
-            new Wall(circleWallShape, new Vector(250, 150), this.randomSpin()),
-            new Wall(circleWallShape, new Vector(250, -150), this.randomSpin()),
-            new Wall(circleWallShape, new Vector(-250, 150), this.randomSpin()),
-            new Wall(circleWallShape, new Vector(-250, -150), this.randomSpin()),
+            new Wall(ellipseWallShape, new Vector(250, 150), this.randomSpin()),
+            new Wall(ellipseWallShape, new Vector(250, -150), this.randomSpin()),
+            new Wall(ellipseWallShape, new Vector(-250, 150), this.randomSpin()),
+            new Wall(ellipseWallShape, new Vector(-250, -150), this.randomSpin()),
         ])
         const ball = new Ball(this, 0, 0, 25);
         this.addGameObject(ball);
