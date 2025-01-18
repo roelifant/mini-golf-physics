@@ -1,5 +1,5 @@
-import { Vector } from "../math/Vector";
-import { IPoint } from "../math/VectorInterfaces";
+import { Vector } from "../math/vector/Vector";
+import { IPoint } from "../math/vector/VectorInterfaces";
 import { IGameObject } from "./Objects";
 import { IShape } from "./Shapes";
 

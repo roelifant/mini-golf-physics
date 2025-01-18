@@ -1,4 +1,4 @@
-import { Vector } from "../math/Vector";
+import { Vector } from "../math/vector/Vector";
 import { Collider } from "../colliders/Collider";
 import { StaticShapeObject } from "./StaticShapeObject";
 import { DefinedShape } from "../contracts/Shapes";

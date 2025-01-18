@@ -1,3 +1,5 @@
+import { MathUtils } from "../MathUtils";
+
 export class VectorUtils {
 
     /**
@@ -7,7 +9,7 @@ export class VectorUtils {
      * @returns radians
      */
     public degreesToRadians(degrees: number): number {
-        return degrees * (Math.PI/180);
+        return MathUtils.degreesToRadians(degrees);
     }
 
     /**
@@ -17,7 +19,7 @@ export class VectorUtils {
      * @returns degrees
      */
     public radiansToDegrees(radians: number): number {
-        return radians * (180/Math.PI);
+        return MathUtils.radiansToDegrees(radians);
     }
 
     /**

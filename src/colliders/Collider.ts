@@ -1,9 +1,10 @@
 import { Box, Circle, Ellipse, Polygon } from "detect-collisions";
 import { ICollider, ICollisionData } from "../contracts/Colliders";
 import { IActiveGameObject, IGameObject,  } from "../contracts/Objects";
-import {ICircle, IEllipse, IPolygon, IRectangle, IShape, Shape} from "../contracts/Shapes";
-import { Vector } from "../math/Vector";
+import {ICircle, ICurveablePolygon, IEllipse, IPolygon, IRectangle, IShape, Shape} from "../contracts/Shapes";
+import { Vector } from "../math/vector/Vector";
 import { CollisionService } from "../services/CollisionService";
+import { MathUtils } from "../math/MathUtils";
 
 export class Collider implements ICollider {
     public isStatic: boolean;
@@ -69,6 +70,11 @@ export class Collider implements ICollider {
 
         if(shape.type === Shape.POLYGON) {
             const polygon = <IPolygon>shape;
+            this.body = new Polygon(position.toPoint(), polygon.points, options);
+        }
+
+        if(shape.type === Shape.CURVABLEPOLYGON) {
+            const polygon = MathUtils.convertCurveablePolygonToStraightLinedPolygon(<ICurveablePolygon>shape);
             this.body = new Polygon(position.toPoint(), polygon.points, options);
         }
 

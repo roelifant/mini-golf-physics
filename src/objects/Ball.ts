@@ -1,7 +1,7 @@
 import { Container, ContainerChild, Graphics } from "pixi.js";
 import { ICollisionData, ICollider } from "../contracts/Colliders";
 import { IActiveGameObject } from "../contracts/Objects";
-import { Vector } from "../math/Vector";
+import { Vector } from "../math/vector/Vector";
 import { Shape } from "../contracts/Shapes";
 import { Scene } from "../pixi/Scene";
 import { Collider } from "../colliders/Collider";

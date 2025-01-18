@@ -1,24 +1,25 @@
-import { IPoint } from "../math/VectorInterfaces";
+import { IPoint } from "../math/vector/VectorInterfaces";
 
-export type DefinedShape = ICircle|IEllipse|IRectangle|IPolygon;
+export type DefinedShape = ICircle | IEllipse | IRectangle | IPolygon | ICurveablePolygon;
 
 export enum Shape {
     CIRCLE = 'circle',
     ELLIPSE = 'ellipse',
     RECTANGLE = 'rectangle',
     POLYGON = 'polygon',
+    CURVABLEPOLYGON = 'curvablepolygon',
 }
 
 export interface IShape {
     type: Shape,
 }
 
-export interface ICircle extends IShape{
+export interface ICircle extends IShape {
     type: Shape.CIRCLE,
     radius: number,
 }
 
-export interface IEllipse extends IShape{
+export interface IEllipse extends IShape {
     type: Shape.ELLIPSE,
     radius: {
         x: number,
@@ -26,13 +27,26 @@ export interface IEllipse extends IShape{
     },
 }
 
-export interface IRectangle extends IShape{
+export interface IRectangle extends IShape {
     type: Shape.RECTANGLE,
     width: number,
     height: number,
 }
 
-export interface IPolygon extends IShape{
+export interface IPolygonPoint extends IPoint {
+    z: undefined,
+}
+
+export interface IPolygon extends IShape {
     type: Shape.POLYGON,
-    points: Array<IPoint>,
+    points: Array<IPolygonPoint>,
+}
+
+export interface ICurveablePoint extends IPolygonPoint {
+    control?: boolean,
+}
+
+export interface ICurveablePolygon extends IShape {
+    type: Shape.CURVABLEPOLYGON,
+    points: Array<ICurveablePoint>;
 }

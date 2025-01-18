@@ -1,12 +1,13 @@
 import { Container } from "pixi.js";
 import { IGameObject } from "../contracts/Objects";
-import { Vector } from "../math/Vector";
+import { Vector } from "../math/vector/Vector";
 import { Ball } from "../objects/Ball";
 import { Wall } from "../objects/Wall";
 import { Scene } from "../pixi/Scene";
 import { CollisionService } from "../services/CollisionService";
-import { ICircle, IEllipse, IPolygon, IRectangle, Shape } from "../contracts/Shapes";
+import { ICircle, ICurveablePoint, ICurveablePolygon, IEllipse, IPolygon, IRectangle, Shape } from "../contracts/Shapes";
 import { Floor } from "../objects/Floor";
+import { IPoint } from "../math/vector/VectorInterfaces";
 
 export class MiniGolfScene extends Scene {
     public key = 'minigolf';
@@ -41,7 +42,6 @@ export class MiniGolfScene extends Scene {
             type: Shape.CIRCLE,
             radius: 50
         }
-
         const ellipseWallShape = <IEllipse>{
             type: Shape.ELLIPSE,
             radius: {
@@ -49,7 +49,6 @@ export class MiniGolfScene extends Scene {
                 y: 80
             }
         }
-
         const triangleWallShape = <IPolygon>{
             type: Shape.POLYGON,
             points: [
@@ -58,6 +57,45 @@ export class MiniGolfScene extends Scene {
                 {x: -80, y: 50},
             ]
         }
+        const concaveWallShape = <IPolygon>{
+            type: Shape.POLYGON,
+            points: [
+                {x: -50, y: -100},
+                {x: 80, y: -100},
+                {x: 70, y: -75},
+                {x: 55, y: -50},
+                {x: 40, y: -25},
+                {x: 35, y: 0},
+                {x: 40, y: 25},
+                {x: 55, y: 50},
+                {x: 70, y: 75},
+                {x: 80, y: 100},
+                {x: -50, y: 100},
+            ]
+        }
+        concaveWallShape.points.forEach((point: IPoint) => {
+            point.x *= 1.5;
+            point.y *= 1.5;
+        });
+
+        const curvedConcaveWallShape = <ICurveablePolygon>{
+            type: Shape.CURVABLEPOLYGON,
+            points: [
+                {x: 80, y: 100, control: false},
+                {x: -50, y: 100, control: false},
+                {x: -50, y: -100, control: false},
+                {x: 80, y: -100, control: false},
+                {x: 35, y: -75, control: true},
+                {x: 35, y: -25, control: true},
+                {x: 35, y: 0, control: false},
+                {x: 35, y: 25, control: true},
+                {x: 35, y: 50, control: true},
+            ]
+        }
+        curvedConcaveWallShape.points.forEach((point: IPoint) => {
+            point.x *= 2;
+            point.y *= 2;
+        });
         
         this.addGameObjects([
             new Wall(horizontalWallShape, new Vector(0, 350), this.randomWobble()),
@@ -66,14 +104,15 @@ export class MiniGolfScene extends Scene {
             new Wall(verticalWallShape, new Vector(550, 0), this.randomWobble()),
 
             new Wall(circleWallShape, new Vector(400, 0), this.randomSpin()),
-            new Wall(triangleWallShape, new Vector(-400, 0), this.randomSpin()),
+            new Wall(ellipseWallShape, new Vector(-400, 0), this.randomSpin()),
             new Wall(triangleWallShape, new Vector(0, 200), this.randomSpin()),
             new Wall(circleWallShape, new Vector(0, -200), this.randomSpin()),
 
-            new Wall(ellipseWallShape, new Vector(250, 150), this.randomSpin()),
-            new Wall(triangleWallShape, new Vector(250, -150), this.randomSpin()),
-            new Wall(triangleWallShape, new Vector(-250, 150), this.randomSpin()),
-            new Wall(ellipseWallShape, new Vector(-250, -150), this.randomSpin()),
+            new Wall(curvedConcaveWallShape, new Vector(-500, -300), Vector.utils.degreesToRadians(45)),
+            new Wall(curvedConcaveWallShape, new Vector(500, -300), Vector.utils.degreesToRadians(90+45)),
+            new Wall(curvedConcaveWallShape, new Vector(-500, 300), Vector.utils.degreesToRadians(-45)),
+            new Wall(curvedConcaveWallShape, new Vector(500, 300), Vector.utils.degreesToRadians(-90-45)),
+
         ], wallContainer);
         const ball = new Ball(this, 0, 0, 25);
         this.addGameObject(ball);
@@ -108,6 +147,5 @@ export class MiniGolfScene extends Scene {
             return;
         }
         this.stage.addChild(object.visuals);
-
     }
 }

@@ -1,5 +1,5 @@
 import { DefinedShape } from "../contracts/Shapes";
-import { Vector } from "../math/Vector";
+import { Vector } from "../math/vector/Vector";
 import { StaticShapeObject } from "./StaticShapeObject";
 
 export class Floor extends StaticShapeObject {

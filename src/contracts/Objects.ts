@@ -1,5 +1,5 @@
 import { Container, Graphics } from "pixi.js";
-import { Vector } from "../math/Vector";
+import { Vector } from "../math/vector/Vector";
 import { ICollider, ICollisionData } from "./Colliders";
 
 export interface IGameObject {
