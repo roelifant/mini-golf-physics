@@ -287,7 +287,8 @@ export class PixiManager {
                 resolution: window.devicePixelRatio || 1,
                 resizeTo: config.elementToResizeTo ?? document.querySelector('body')!,
                 autoDensity: true,
-                canvas: config.canvas
+                canvas: config.canvas,
+                backgroundColor: 0xffffff
             });
 
             PixiManager.app = app;

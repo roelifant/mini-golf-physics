@@ -6,6 +6,7 @@ import { Wall } from "../objects/Wall";
 import { Scene } from "../pixi/Scene";
 import { CollisionService } from "../services/CollisionService";
 import { ICircle, IEllipse, IPolygon, IRectangle, Shape } from "../contracts/Shapes";
+import { Floor } from "../objects/Floor";
 
 export class MiniGolfScene extends Scene {
     public key = 'minigolf';
@@ -13,6 +14,18 @@ export class MiniGolfScene extends Scene {
     public balls: Array<Ball> = [];
 
     public setup() {
+        const floorContainer = new Container();
+        const wallContainer = new Container();
+        this.add(floorContainer);
+        this.add(wallContainer);
+
+        const floorShape = <IRectangle>{
+            type: Shape.RECTANGLE,
+            width: 1100,
+            height: 700
+        };
+
+        this.addGameObject(new Floor(floorShape, new Vector(0,0), 0), floorContainer);
 
         const horizontalWallShape = <IRectangle>{
             type: Shape.RECTANGLE,
@@ -61,7 +74,7 @@ export class MiniGolfScene extends Scene {
             new Wall(triangleWallShape, new Vector(250, -150), this.randomSpin()),
             new Wall(triangleWallShape, new Vector(-250, 150), this.randomSpin()),
             new Wall(ellipseWallShape, new Vector(-250, -150), this.randomSpin()),
-        ])
+        ], wallContainer);
         const ball = new Ball(this, 0, 0, 25);
         this.addGameObject(ball);
         this.balls.push(ball);

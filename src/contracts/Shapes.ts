@@ -1,5 +1,7 @@
 import { IPoint } from "../math/VectorInterfaces";
 
+export type DefinedShape = ICircle|IEllipse|IRectangle|IPolygon;
+
 export enum Shape {
     CIRCLE = 'circle',
     ELLIPSE = 'ellipse',
