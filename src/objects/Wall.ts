@@ -2,9 +2,8 @@ import { Container, ContainerChild, Graphics } from "pixi.js";
 import { ICollider } from "../contracts/Colliders";
 import { IActiveGameObject, IGameObject } from "../contracts/Objects";
 import { Vector } from "../math/Vector";
-import { Scene } from "../pixi/Scene";
 import { Collider } from "../colliders/Collider";
-import { Shape } from "../contracts/Shapes";
+import { ICircle, IEllipse, IPolygon, IRectangle, IShape, Shape } from "../contracts/Shapes";
 
 export class Wall implements IGameObject {
     public visuals: Container<ContainerChild> | Graphics;
@@ -12,31 +11,44 @@ export class Wall implements IGameObject {
     public collider?: ICollider | undefined;
     public angle: number;
     
-    constructor (scene: Scene, x: number, y: number, width: number, height: number, angle: number) {
-        this.visuals = (new Graphics())
-        .rect(0, 0, width, height)
-        .fill(0xffffff);
-        this.visuals.pivot.x = width/2;
-        this.visuals.pivot.y = height/2;
+    constructor (shape: IRectangle|ICircle|IEllipse|IPolygon, position: Vector, angle: number) {
+        this.visuals = this.createVisualForShape(shape);
+
         this.visuals.rotation = angle;
-        scene.add(this.visuals);
+        this.visuals.position.x = position.x;
+        this.visuals.position.y = position.y;
 
-        this.visuals.position.x = x;
-        this.visuals.position.y = y;
-
-        this.position = new Vector(x, y);
+        this.position = position.copy();
         this.angle = angle;
-
-        const shape = {
-            type: Shape.RECTANGLE,
-            width: width,
-            height: height
-        }
         this.collider = new Collider(this, shape, this.position, angle, ['wall']);
     }
 
     public isActive(): this is IActiveGameObject
     {
         return false;
+    }
+
+    private createVisualForShape(shape: IShape): Graphics {
+        if(shape.type === Shape.RECTANGLE) {
+            const rectangle = <IRectangle>shape;
+            const visual = (new Graphics())
+            .rect(0, 0, rectangle.width, rectangle.height)
+            .fill(0xffffff);
+            visual.pivot.x = rectangle.width/2;
+            visual.pivot.y = rectangle.height/2;
+            return visual;
+        }
+
+        if(shape.type === Shape.CIRCLE) {
+            const circle = <ICircle>shape;
+            const visual = (new Graphics())
+            .circle(0, 0, circle.radius)
+            .fill(0xffffff);
+            // visual.pivot.x = circle.radius/2;
+            // visual.pivot.y = circle.radius/2;
+            return visual;
+        }
+
+        throw new Error('Cannot create wall visual for this shape');
     }
 }

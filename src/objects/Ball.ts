@@ -78,20 +78,22 @@ export class Ball implements IActiveGameObject {
     public onCollision(collider: ICollider, data: ICollisionData): void {
         if(collider.hasTag('wall')) {
             // touching wall
-            
+
             // get the overlap into a vector
             const overlapVector = Vector.fromPoint(data.overlapV);
             // calculate the position this object should have to negate the collision
             const negatedPosition = this.position.subtract(overlapVector);
-            // calculate the difference (transformation) from current position to negated position
-            const negatedDiff = negatedPosition.subtract(this.position);
-            // bounce the momentum off the line of the collision object
-            this.momentum = this.momentum.bounceOffLine(negatedDiff.perpendicular2D());
 
-            // add extra drag
-            // drag
-            if(this.momentum.length !== 0) {
-                this.momentum = this.momentum.subtractLength(this.collisionDrag);
+            if(this.momentum.length > 0) {
+                // calculate the difference (transformation) from current position to negated position
+                const negatedDiff = negatedPosition.subtract(this.position);
+                // bounce the momentum off the line of the collision object
+                this.momentum = this.momentum.bounceOffLine(negatedDiff.perpendicular2D());
+
+                // add extra drag
+                if(this.momentum.length !== 0) {
+                    this.momentum = this.momentum.subtractLength(this.collisionDrag);
+                }
             }
 
             // move the ball outside of the wall
