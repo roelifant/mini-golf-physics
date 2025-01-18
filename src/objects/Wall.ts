@@ -55,6 +55,14 @@ export class Wall implements IGameObject {
             return visual;
         }
 
+        if(shape.type === Shape.POLYGON) {
+            const polygon = <IPolygon>shape;
+            const visual = (new Graphics())
+            .poly(polygon.points)
+            .fill(0xffffff);
+            return visual;
+        }
+
         throw new Error('Cannot create wall visual for this shape');
     }
 }

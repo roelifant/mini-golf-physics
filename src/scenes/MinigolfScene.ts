@@ -5,7 +5,7 @@ import { Ball } from "../objects/Ball";
 import { Wall } from "../objects/Wall";
 import { Scene } from "../pixi/Scene";
 import { CollisionService } from "../services/CollisionService";
-import { ICircle, IEllipse, IRectangle, Shape } from "../contracts/Shapes";
+import { ICircle, IEllipse, IPolygon, IRectangle, Shape } from "../contracts/Shapes";
 
 export class MiniGolfScene extends Scene {
     public key = 'minigolf';
@@ -36,6 +36,15 @@ export class MiniGolfScene extends Scene {
                 y: 80
             }
         }
+
+        const triangleWallShape = <IPolygon>{
+            type: Shape.POLYGON,
+            points: [
+                {x: 0, y: -80},
+                {x: 80, y: 50},
+                {x: -80, y: 50},
+            ]
+        }
         
         this.addGameObjects([
             new Wall(horizontalWallShape, new Vector(0, 350), this.randomWobble()),
@@ -44,13 +53,13 @@ export class MiniGolfScene extends Scene {
             new Wall(verticalWallShape, new Vector(550, 0), this.randomWobble()),
 
             new Wall(circleWallShape, new Vector(400, 0), this.randomSpin()),
-            new Wall(circleWallShape, new Vector(-400, 0), this.randomSpin()),
-            new Wall(circleWallShape, new Vector(0, 200), this.randomSpin()),
+            new Wall(triangleWallShape, new Vector(-400, 0), this.randomSpin()),
+            new Wall(triangleWallShape, new Vector(0, 200), this.randomSpin()),
             new Wall(circleWallShape, new Vector(0, -200), this.randomSpin()),
 
             new Wall(ellipseWallShape, new Vector(250, 150), this.randomSpin()),
-            new Wall(ellipseWallShape, new Vector(250, -150), this.randomSpin()),
-            new Wall(ellipseWallShape, new Vector(-250, 150), this.randomSpin()),
+            new Wall(triangleWallShape, new Vector(250, -150), this.randomSpin()),
+            new Wall(triangleWallShape, new Vector(-250, 150), this.randomSpin()),
             new Wall(ellipseWallShape, new Vector(-250, -150), this.randomSpin()),
         ])
         const ball = new Ball(this, 0, 0, 25);
