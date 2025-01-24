@@ -1,4 +1,4 @@
-import { ICurveablePoint, ICurveablePolygon, IPolygon, IPolygonPoint, Shape } from "../contracts/Shapes";
+import { ICurveablePoint, ICurveablePolygon, IPolygon, Shape } from "../contracts/Shapes";
 import { IPoint } from "./vector/VectorInterfaces";
 
 export class MathUtils {

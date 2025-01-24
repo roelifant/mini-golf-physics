@@ -17,18 +17,18 @@ export class MouseListener {
         element.addEventListener('mousemove', (event: MouseEvent) => {
             MouseListener.position = new Vector(event.clientX, event.clientY);
         });
-        element.addEventListener('mousedown', (event: MouseEvent) => {
+        element.addEventListener('mousedown', () => {
             if(!MouseListener.down) {
                 MouseListener.downSince = Date.now();
             }
             MouseListener.down = true;
             MouseListener.updateDownFor();
         });
-        element.addEventListener('mouseup', (event: MouseEvent) => {
+        element.addEventListener('mouseup', () => {
             MouseListener.down = false;
             MouseListener.updateDownFor();
         });
-        element.addEventListener('click', (event: MouseEvent) => {
+        element.addEventListener('click', () => {
             MouseListener.down = false;
             for (const callback of MouseListener.clickHandlers) {
                 callback(<IMouseListenerClickEvent>{
