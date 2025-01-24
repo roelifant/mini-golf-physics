@@ -4,6 +4,7 @@ import {NoStageSceneError} from "./Errors.ts";
 import {Transition} from "./Transition.ts";
 import {ISceneAssets} from "./Types.ts";
 import { Container } from "pixi.js";
+import { Vector } from "../math/vector/Vector.ts";
 
 export class Scene {
 
@@ -58,6 +59,13 @@ export class Scene {
      * Is the scene open? = The scene is visible to the user
      */
     public open: boolean = false;
+
+    /**
+     * get the pan of the stage
+     */
+    public get pan(): Vector {
+        return new Vector(this.stage.center.x, this.stage.center.y);
+    }
 
     /**
      * Make true if you want the 0,0 coordinate to be at the center of the screen

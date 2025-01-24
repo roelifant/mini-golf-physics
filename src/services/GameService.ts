@@ -1,3 +1,5 @@
+import { MouseListener } from "../listeners/MouseListener";
+import { Vector } from "../math/vector/Vector";
 import { PixiManager } from "../pixi/PixiManager";
 import { Scene } from "../pixi/Scene";
 
@@ -26,5 +28,12 @@ export class GameService {
 
     public get scene(): Scene {
         return PixiManager.scene;
+    }
+
+    public get worldMousePosition(): Vector {
+        const canvasDimensions = new Vector(PixiManager.width/2,PixiManager.height/2);
+        const transformationVector = this.scene.pan.subtract(canvasDimensions);
+        const mousePosition = MouseListener.position.add(transformationVector);
+        return mousePosition;
     }
 }

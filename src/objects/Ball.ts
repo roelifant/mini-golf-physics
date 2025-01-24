@@ -51,7 +51,7 @@ export class Ball implements IActiveGameObject {
             this.visuals.position.x = x;
             this.visuals.position.y = y;
 
-            this.momentum = Vector.random().scale(0.6);
+            this.momentum = Vector.empty();
             this.drag = 0.0001;
             this.collisionDrag = 0.03;
     
@@ -99,5 +99,11 @@ export class Ball implements IActiveGameObject {
             // move the ball outside of the wall
             this.position = negatedPosition;
         }
+    }
+
+    public launch(target: Vector, magnitude: number) {
+        const direction = target.subtract(this.position).normalize();
+
+        this.momentum = direction.scale(magnitude/1500);
     }
 }

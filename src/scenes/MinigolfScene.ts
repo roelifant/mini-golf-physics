@@ -1,18 +1,21 @@
-import { Container } from "pixi.js";
+import { Container, Graphics } from "pixi.js";
 import { IGameObject } from "../contracts/Objects";
 import { Vector } from "../math/vector/Vector";
 import { Ball } from "../objects/Ball";
 import { Wall } from "../objects/Wall";
 import { Scene } from "../pixi/Scene";
 import { CollisionService } from "../services/CollisionService";
-import { ICircle, ICurveablePoint, ICurveablePolygon, IEllipse, IPolygon, IRectangle, Shape } from "../contracts/Shapes";
+import { ICircle, ICurveablePolygon, IEllipse, IPolygon, IRectangle, Shape } from "../contracts/Shapes";
 import { Floor } from "../objects/Floor";
 import { IPoint } from "../math/vector/VectorInterfaces";
+import { IMouseListenerClickEvent, MouseListener } from "../listeners/MouseListener";
+import { GameService } from "../services/GameService";
 
 export class MiniGolfScene extends Scene {
     public key = 'minigolf';
     public centered = true;
-    public balls: Array<Ball> = [];
+    private balls: Array<Ball> = [];
+    private mouseTracker: Graphics = new Graphics();
 
     public setup() {
         const floorContainer = new Container();
@@ -117,9 +120,23 @@ export class MiniGolfScene extends Scene {
         const ball = new Ball(this, 0, 0, 25);
         this.addGameObject(ball);
         this.balls.push(ball);
+
+        MouseListener.registerClickHandler((event: IMouseListenerClickEvent) => {
+            const ball = this.balls[0];
+            ball.launch(GameService.instance.worldMousePosition, event.downFor);
+        });
+
+        this.mouseTracker
+            .circle(0, 0, 5)
+            .fill(0xff0000);
+        this.stage.addChild(this.mouseTracker);
     }
 
     public update(deltaTime: number) {
+        const mousePosition = GameService.instance.worldMousePosition;
+        this.mouseTracker.position.x = mousePosition.x;
+        this.mouseTracker.position.y = mousePosition.y;
+
         for (const ball of this.balls) {
             ball.update(deltaTime);
         }

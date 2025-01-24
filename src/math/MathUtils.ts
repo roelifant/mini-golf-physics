@@ -50,7 +50,7 @@ export class MathUtils {
         return points[0];
     }
 
-    static convertCubicBezierToPoints(
+    public static convertCubicBezierToPoints(
         start: IPoint,
         control1: IPoint,
         control2: IPoint,
@@ -120,7 +120,6 @@ export class MathUtils {
                 (point.hasOwnProperty('control') && point.control) &&
                 (nextPoint.hasOwnProperty('control') && nextPoint.control) &&
                 (!nextPoint2.hasOwnProperty('control') || !nextPoint2.control)
-                
             ){
                 MathUtils
                     .convertCubicBezierToPoints(previousPoint, point, nextPoint, nextPoint2, stepsPerCurve)
@@ -131,8 +130,6 @@ export class MathUtils {
 
             newPoints.push(point);
         }
-
-        console.log(newPoints);
 
         return <IPolygon>{
             type: Shape.POLYGON,
