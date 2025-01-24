@@ -4,9 +4,13 @@ import { MiniGolfScene } from './scenes/MinigolfScene';
 import './style.css'
 
 async function startUp() {
+  const body = <HTMLBodyElement>document.querySelector('body');
   const canvas = <HTMLCanvasElement>document.querySelector('#game-canvas');
 
-  await PixiManager.init({canvas});
+  await PixiManager.init({
+    canvas,
+    elementToResizeTo: body
+  });
 
   PixiManager.registerScenes([
       new MiniGolfScene(),

@@ -68,6 +68,13 @@ export class Scene {
     }
 
     /**
+     * get the scale of the stage
+     */
+    public get scale(): number {
+        return this.stage.scaled;
+    }
+
+    /**
      * Make true if you want the 0,0 coordinate to be at the center of the screen
      */
     protected centered: boolean = false;

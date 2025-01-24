@@ -31,9 +31,10 @@ export class GameService {
     }
 
     public get worldMousePosition(): Vector {
+        const mousePosition = MouseListener.position;
         const canvasDimensions = new Vector(PixiManager.width/2,PixiManager.height/2);
-        const transformationVector = this.scene.pan.subtract(canvasDimensions);
-        const mousePosition = MouseListener.position.add(transformationVector);
-        return mousePosition;
+        const zoom = this.scene.scale;
+
+        return mousePosition.subtract(canvasDimensions).scale(1/zoom).add(this.scene.pan);
     }
 }

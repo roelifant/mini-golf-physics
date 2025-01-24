@@ -18,6 +18,16 @@ export class MiniGolfScene extends Scene {
     private mouseTracker: Graphics = new Graphics();
 
     public setup() {
+        // enable zoom
+        this.stage
+            .wheel({
+                smooth: 8
+            })
+            .clampZoom({
+                minScale: 0.3,
+                maxScale: 2.5,
+            });
+
         const floorContainer = new Container();
         const wallContainer = new Container();
         this.add(floorContainer);
