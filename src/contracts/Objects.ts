@@ -8,10 +8,14 @@ export interface IGameObject {
     angle: number,
     collider?: ICollider,
 
-    isActive(): this is IActiveGameObject
+    isActive(): this is IActiveGameObject,
+    isTrigger(): this is ITriggerGameObject,
+}
+
+export interface ITriggerGameObject extends IGameObject {
+    onCollision(collider: ICollider, data: ICollisionData): void,
 }
 
 export interface IActiveGameObject extends IGameObject {
     update(deltaTime: number): void,
-    onCollision(collider: ICollider, data: ICollisionData): void,
 }

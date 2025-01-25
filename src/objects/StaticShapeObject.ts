@@ -1,6 +1,6 @@
 import { Container, ContainerChild, Graphics } from "pixi.js";
 import { ICollider } from "../contracts/Colliders";
-import { IActiveGameObject, IGameObject } from "../contracts/Objects";
+import { IActiveGameObject, IGameObject, ITriggerGameObject } from "../contracts/Objects";
 import { Vector } from "../math/vector/Vector";
 import { DefinedShape, ICircle, ICurveablePolygon, IEllipse, IPolygon, IRectangle, IShape, Shape } from "../contracts/Shapes";
 
@@ -24,6 +24,11 @@ export abstract class StaticShapeObject implements IGameObject {
     }
 
     public isActive(): this is IActiveGameObject
+    {
+        return false;
+    }
+
+    public isTrigger(): this is ITriggerGameObject
     {
         return false;
     }

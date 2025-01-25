@@ -1,6 +1,6 @@
 import { Box, Circle, Ellipse, Polygon } from "detect-collisions";
 import { ICollider, ICollisionData } from "../contracts/Colliders";
-import { IActiveGameObject, IGameObject,  } from "../contracts/Objects";
+import { IGameObject, ITriggerGameObject,  } from "../contracts/Objects";
 import {ICircle, ICurveablePolygon, IEllipse, IPolygon, IRectangle, IShape, Shape} from "../contracts/Shapes";
 import { Vector } from "../math/vector/Vector";
 import { CollisionService } from "../services/CollisionService";
@@ -9,7 +9,7 @@ import { MathUtils } from "../math/MathUtils";
 export class Collider implements ICollider {
     public isStatic: boolean;
     public shape: IShape;
-    public owner: IGameObject|IActiveGameObject;
+    public owner: IGameObject|ITriggerGameObject;
     public tags: string[];
     private body: Box|Circle|Ellipse|Polygon|undefined;
 
@@ -23,6 +23,16 @@ export class Collider implements ICollider {
     
     public hasTag(tag: string): boolean {
         return this.tags.includes(tag);
+    }
+
+    public addTag(tag: string): void {
+        this.tags.push(tag);
+    }
+
+    public addTags(tags: Array<string>): void {
+        for (const tag of tags) {
+            this.addTag(tag);
+        }
     }
 
     public setPosition(position: Vector): void {
@@ -86,7 +96,7 @@ export class Collider implements ICollider {
     }
 
     public handleCollision(collider: ICollider, data: ICollisionData): void {
-        if(this.owner.isActive()) {
+        if(this.owner.isTrigger()) {
             this.owner.onCollision(collider, data);
         }
     }

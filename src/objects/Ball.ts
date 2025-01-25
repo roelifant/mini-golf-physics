@@ -1,14 +1,15 @@
 import { Container, ContainerChild, Graphics } from "pixi.js";
 import { ICollisionData, ICollider } from "../contracts/Colliders";
-import { IActiveGameObject } from "../contracts/Objects";
+import { IActiveGameObject, ITriggerGameObject } from "../contracts/Objects";
 import { Vector } from "../math/vector/Vector";
 import { Shape } from "../contracts/Shapes";
 import { Scene } from "../pixi/Scene";
 import { Collider } from "../colliders/Collider";
 import { GameService } from "../services/GameService";
 import { MouseListener } from "../listeners/MouseListener";
+import { BreakableWall } from "./BreakableWall";
 
-export class Ball implements IActiveGameObject {
+export class Ball implements IActiveGameObject, ITriggerGameObject {
     public visuals: Container<ContainerChild> | Graphics;
     public momentum: Vector;
     public collider?: ICollider | undefined;
@@ -126,6 +127,11 @@ export class Ball implements IActiveGameObject {
         return true;
     }
 
+    public isTrigger(): this is ITriggerGameObject
+    {
+        return true;
+    }
+
     public update(deltaTime: number): void {
 
         this.trail.angle += 1;
@@ -174,6 +180,11 @@ export class Ball implements IActiveGameObject {
 
             // move the ball outside of the wall
             this.position = negatedPosition;
+
+            if(collider.hasTag('breakable')) {
+                const wall = <BreakableWall>collider.owner;
+                wall.hit();
+            }
         }
     }
 

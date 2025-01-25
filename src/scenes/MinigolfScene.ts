@@ -10,6 +10,7 @@ import { Floor } from "../objects/Floor";
 import { IPoint } from "../math/vector/VectorInterfaces";
 import { IMouseListenerClickEvent, MouseListener } from "../listeners/MouseListener";
 import { GameService } from "../services/GameService";
+import { BreakableWall } from "../objects/BreakableWall";
 
 export class MiniGolfScene extends Scene {
     public key = 'minigolf';
@@ -119,10 +120,10 @@ export class MiniGolfScene extends Scene {
             new Wall(verticalWallShape, new Vector(-550, 0), this.randomWobble()),
             new Wall(verticalWallShape, new Vector(550, 0), this.randomWobble()),
 
-            new Wall(circleWallShape, new Vector(400, 0), this.randomSpin()),
-            new Wall(ellipseWallShape, new Vector(-400, 0), this.randomSpin()),
-            new Wall(triangleWallShape, new Vector(0, 200), this.randomSpin()),
-            new Wall(circleWallShape, new Vector(0, -200), this.randomSpin()),
+            new BreakableWall(circleWallShape, new Vector(400, 0), this.randomSpin(), 3),
+            new BreakableWall(ellipseWallShape, new Vector(-400, 0), this.randomSpin(), 3),
+            new BreakableWall(triangleWallShape, new Vector(0, 200), this.randomSpin(), 3),
+            new BreakableWall(circleWallShape, new Vector(0, -200), this.randomSpin(), 3),
 
             new Wall(curvedConcaveWallShape, new Vector(-500, -300), Vector.utils.degreesToRadians(45)),
             new Wall(curvedConcaveWallShape, new Vector(500, -300), Vector.utils.degreesToRadians(90+45)),

@@ -9,6 +9,8 @@ export interface ICollider {
     tags: Array<string>,
     isStatic: boolean,
 
+    addTag(tag: string): void,
+    addTags(tags: Array<string>): void,
     hasTag(tag: string): boolean,
     setPosition(position: Vector): void,
     setAngle(angle: number): void,
