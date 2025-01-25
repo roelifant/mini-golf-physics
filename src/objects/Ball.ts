@@ -55,7 +55,7 @@ export class Ball implements IActiveGameObject, ITriggerGameObject {
         return this.momentum.length === 0;
     }
 
-    constructor(scene: Scene, x: number, y: number, radius: number) {
+    constructor(scene: Scene, position: Vector, radius: number) {
         // make ball
         const ball = (new Graphics())
             .circle(0, 0, radius)
@@ -109,8 +109,8 @@ export class Ball implements IActiveGameObject, ITriggerGameObject {
         this.visuals.addChild(this.trail);
         scene.add(this.visuals);
 
-        this.visuals.position.x = x;
-        this.visuals.position.y = y;
+        this.visuals.position.x = position.x;
+        this.visuals.position.y = position.y;
 
         this.momentum = Vector.empty();
         this.drag = 0.00015;

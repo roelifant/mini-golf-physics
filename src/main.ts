@@ -1,3 +1,4 @@
+import { testLevel } from './levels/TestLevel';
 import { MouseListener } from './listeners/MouseListener';
 import { PixiManager } from './pixi/PixiManager';
 import { MiniGolfScene } from './scenes/MinigolfScene';
@@ -13,7 +14,7 @@ async function startUp() {
   });
 
   PixiManager.registerScenes([
-      new MiniGolfScene(),
+      new MiniGolfScene(testLevel),
   ]);
 
   MouseListener.initialize(canvas);
