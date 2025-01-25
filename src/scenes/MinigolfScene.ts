@@ -1,4 +1,4 @@
-import { Container, Graphics } from "pixi.js";
+import { Container } from "pixi.js";
 import { IGameObject } from "../contracts/Objects";
 import { Vector } from "../math/vector/Vector";
 import { Ball } from "../objects/Ball";
@@ -15,7 +15,6 @@ export class MiniGolfScene extends Scene {
     public key = 'minigolf';
     public centered = true;
     private balls: Array<Ball> = [];
-    private mouseTracker: Graphics = new Graphics();
 
     public setup() {
         // enable zoom
@@ -31,9 +30,11 @@ export class MiniGolfScene extends Scene {
         const floorContainer = new Container();
         const ballContainer = new Container();
         const wallContainer = new Container();
+        const arrowContainer = new Container();
         this.add(floorContainer);
         this.add(ballContainer);
         this.add(wallContainer);
+        this.add(arrowContainer);
 
         const floorShape = <IRectangle>{
             type: Shape.RECTANGLE,
@@ -131,24 +132,18 @@ export class MiniGolfScene extends Scene {
         ], wallContainer);
         const ball = new Ball(this, 0, 0, 20);
         this.addGameObject(ball, ballContainer);
+        arrowContainer.addChild(ball.arrowContainer);
         this.balls.push(ball);
 
         MouseListener.registerClickHandler((event: IMouseListenerClickEvent) => {
             const ball = this.balls[0];
-            ball.launch(GameService.instance.worldMousePosition, event.downFor);
+            if(ball.canLaunch) {
+                ball.launch(GameService.instance.worldMousePosition, Date.now() - event.downSince);
+            }
         });
-
-        this.mouseTracker
-            .circle(0, 0, 5)
-            .fill(0xff0000);
-        this.stage.addChild(this.mouseTracker);
     }
 
     public update(deltaTime: number) {
-        const mousePosition = GameService.instance.worldMousePosition;
-        this.mouseTracker.position.x = mousePosition.x;
-        this.mouseTracker.position.y = mousePosition.y;
-
         for (const ball of this.balls) {
             ball.update(deltaTime);
         }

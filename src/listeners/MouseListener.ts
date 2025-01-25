@@ -3,14 +3,12 @@ import { Vector } from "../math/vector/Vector";
 export interface IMouseListenerClickEvent {
     position: Vector;
     downSince: number;
-    downFor: number;
 }
 
 export class MouseListener {
     public static position: Vector = Vector.empty();
     public static down: boolean = false;
     public static downSince: number|null = null;
-    public static downFor: number = 0;
     private static clickHandlers: Array<CallableFunction> = [];
 
     public static initialize(element: HTMLElement) {
@@ -22,11 +20,9 @@ export class MouseListener {
                 MouseListener.downSince = Date.now();
             }
             MouseListener.down = true;
-            MouseListener.updateDownFor();
         });
         element.addEventListener('mouseup', () => {
             MouseListener.down = false;
-            MouseListener.updateDownFor();
         });
         element.addEventListener('click', () => {
             MouseListener.down = false;
@@ -34,11 +30,9 @@ export class MouseListener {
                 callback(<IMouseListenerClickEvent>{
                     position: MouseListener.position.copy(),
                     downSince: MouseListener.downSince,
-                    downFor: MouseListener.downFor,
                 });
             }
             MouseListener.downSince = null;
-            MouseListener.downFor = 0;
         });
     }
 
@@ -48,11 +42,5 @@ export class MouseListener {
 
     public static clearClickHandlers() {
         MouseListener.clickHandlers = [];
-    }
-
-    private static updateDownFor() {
-        if(MouseListener.downSince !== null) {
-            MouseListener.downFor = Date.now() - MouseListener.downSince;
-        }
     }
 }

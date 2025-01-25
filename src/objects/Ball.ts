@@ -5,6 +5,8 @@ import { Vector } from "../math/vector/Vector";
 import { Shape } from "../contracts/Shapes";
 import { Scene } from "../pixi/Scene";
 import { Collider } from "../colliders/Collider";
+import { GameService } from "../services/GameService";
+import { MouseListener } from "../listeners/MouseListener";
 
 export class Ball implements IActiveGameObject {
     public visuals: Container<ContainerChild> | Graphics;
@@ -13,8 +15,12 @@ export class Ball implements IActiveGameObject {
     public drag: number;
     public collisionDrag: number;
     public angle: number = 0;
+    public arrowContainer: Container = new Container();
 
+    private timeToForce = 1200;
+    private maxForce: number = 1.5;
     private trail: Container = new Container();
+    private arrow: Graphics = new Graphics();
 
     public get position(): Vector {
         return new Vector(this.visuals.position.x, this.visuals.position.y);
@@ -44,57 +50,77 @@ export class Ball implements IActiveGameObject {
         this.collider?.setPosition(new Vector(this.position.x, value));
     }
 
-    constructor (scene: Scene, x: number, y: number, radius: number) {
-            const ball = (new Graphics())
+    public get canLaunch(): boolean {
+        return this.momentum.length === 0;
+    }
+
+    constructor(scene: Scene, x: number, y: number, radius: number) {
+        // make ball
+        const ball = (new Graphics())
             .circle(0, 0, radius)
             .fill(0x0000ff);
 
-            const trailSegment1 = (new Graphics())
-                .rect(0,0, radius*2, radius/2)
-                .fill(0x0000ff);
-            this.trail.addChild(trailSegment1);
-            const trailSegment2 = (new Graphics())
-                .rect(0,0, radius*2, radius)
-                .fill(0x0000ff);
-            trailSegment2.alpha = 0.2;
-            this.trail.addChild(trailSegment2);
-            const trailSegment3 = (new Graphics())
-                .rect(0,0, radius*2, (radius/2)*3)
-                .fill(0x0000ff);
-            trailSegment3.alpha = 0.2;
-            this.trail.addChild(trailSegment3);
-            const trailSegment4 = (new Graphics())
-                .rect(0,0, radius*2, radius*2)
-                .fill(0x0000ff);
-            trailSegment4.alpha = 0.2;
-            this.trail.addChild(trailSegment4);
-            const trailSegment5 = (new Graphics())
-                .rect(0,0, radius*2, radius*3)
-                .fill(0x0000ff);
-            trailSegment5.alpha = 0.2;
-            this.trail.addChild(trailSegment5);
-            this.trail.alpha = 0;
-            this.trail.pivot.x = radius;
-            this.trail.pivot.y = 0;
+        // make trail
+        const trailSegment1 = (new Graphics())
+            .rect(0, 0, radius * 2, radius / 2)
+            .fill(0x0000ff);
+        this.trail.addChild(trailSegment1);
+        const trailSegment2 = (new Graphics())
+            .rect(0, 0, radius * 2, radius)
+            .fill(0x0000ff);
+        trailSegment2.alpha = 0.2;
+        this.trail.addChild(trailSegment2);
+        const trailSegment3 = (new Graphics())
+            .rect(0, 0, radius * 2, (radius / 2) * 3)
+            .fill(0x0000ff);
+        trailSegment3.alpha = 0.2;
+        this.trail.addChild(trailSegment3);
+        const trailSegment4 = (new Graphics())
+            .rect(0, 0, radius * 2, radius * 2)
+            .fill(0x0000ff);
+        trailSegment4.alpha = 0.2;
+        this.trail.addChild(trailSegment4);
+        const trailSegment5 = (new Graphics())
+            .rect(0, 0, radius * 2, radius * 3)
+            .fill(0x0000ff);
+        trailSegment5.alpha = 0.2;
+        this.trail.addChild(trailSegment5);
+        this.trail.alpha = 0;
+        this.trail.pivot.x = radius;
+        this.trail.pivot.y = 0;
 
-            this.visuals = new Container;
-            this.visuals.addChild(ball);
-            this.visuals.addChild(this.trail);
-            scene.add(this.visuals);
-    
-            this.visuals.position.x = x;
-            this.visuals.position.y = y;
 
-            this.momentum = Vector.empty();
-            this.drag = 0.0001;
-            this.collisionDrag = 0.03;
-    
-            const shape = {
-                type: Shape.CIRCLE,
-                radius
-            }
-            this.collider = new Collider(this, shape, this.position, 0, ['ball']);
+        // make arrow
+        this.arrow
+            .poly([
+                {x: -10, y: 0},
+                {x: 10, y: 0},
+                {x: 0, y: -10},
+            ])
+            .fill(0x0000ff);
+        this.arrowContainer.addChild(this.arrow);
+        this.arrowContainer.pivot.y = radius + 10;
+
+
+        // combine visuals
+        this.visuals = new Container;
+        this.visuals.addChild(ball);
+        this.visuals.addChild(this.trail);
+        scene.add(this.visuals);
+
+        this.visuals.position.x = x;
+        this.visuals.position.y = y;
+
+        this.momentum = Vector.empty();
+        this.drag = 0.00015;
+        this.collisionDrag = 0.03;
+
+        const shape = {
+            type: Shape.CIRCLE,
+            radius
         }
+        this.collider = new Collider(this, shape, this.position, 0, ['ball']);
+    }
 
     public isActive(): this is IActiveGameObject {
         return true;
@@ -106,16 +132,19 @@ export class Ball implements IActiveGameObject {
 
         this.position = this.position.add(this.momentum.scale(deltaTime));
 
-        if(this.momentum.length === 0) {
+        if (this.canLaunch) {
+            this.arrowContainer.position = this.position.copy();
+            this.handleArrow();
             this.hideTrail();
             return;
         }
+        this.hideArrow();
 
         // drag
         this.momentum = this.momentum.subtractLength(this.drag * deltaTime);
 
         // trail
-        if(this.momentum.length < .2) {
+        if (this.momentum.length < .2) {
             this.hideTrail();
             return;
         }
@@ -123,7 +152,7 @@ export class Ball implements IActiveGameObject {
     }
 
     public onCollision(collider: ICollider, data: ICollisionData): void {
-        if(collider.hasTag('wall')) {
+        if (collider.hasTag('wall')) {
             // touching wall
 
             // get the overlap into a vector
@@ -131,14 +160,14 @@ export class Ball implements IActiveGameObject {
             // calculate the position this object should have to negate the collision
             const negatedPosition = this.position.subtract(overlapVector);
 
-            if(this.momentum.length > 0) {
+            if (this.momentum.length > 0) {
                 // calculate the difference (transformation) from current position to negated position
                 const negatedDiff = negatedPosition.subtract(this.position);
                 // bounce the momentum off the line of the collision object
                 this.momentum = this.momentum.bounceOffLine(negatedDiff.perpendicular2D());
 
                 // add extra drag
-                if(this.momentum.length !== 0) {
+                if (this.momentum.length !== 0) {
                     this.momentum = this.momentum.subtractLength(this.collisionDrag);
                 }
             }
@@ -149,10 +178,9 @@ export class Ball implements IActiveGameObject {
     }
 
     public launch(target: Vector, magnitude: number) {
-        const maxForce = 1.5;
-        let force = magnitude/1200;
-        if(force > maxForce) {
-            force = maxForce;
+        let force = magnitude / this.timeToForce;
+        if (force > this.maxForce) {
+            force = this.maxForce;
         }
         const direction = target.subtract(this.position).normalize();
 
@@ -167,7 +195,7 @@ export class Ball implements IActiveGameObject {
         const maxLength = 15;
         const maxVisibility = 15;
         let length = this.momentum.length * 2.5;
-        if(length > maxLength) {
+        if (length > maxLength) {
             length = maxLength;
         }
 
@@ -175,5 +203,36 @@ export class Ball implements IActiveGameObject {
         this.trail.rotation = angle;
         this.trail.alpha = length / maxVisibility;
         this.trail.scale.y = length / 2;
+    }
+
+    private hideArrow() {
+        this.arrow.alpha = 0;
+    }
+
+    private handleArrow() {
+        // angle
+        const mousePosition = GameService.instance.worldMousePosition;
+        const direction = mousePosition.subtract(this.position).normalize();
+        const angle = direction.toAngle();
+        this.arrowContainer.rotation = angle;
+        
+        const mouseDownSince = MouseListener.downSince;
+        if(mouseDownSince === null) {
+            this.arrow.scale.x = 1;
+            this.arrow.scale.y = 1;
+            this.arrow.alpha = 0.3;
+            return;
+        }
+
+        const downFor = Date.now() - mouseDownSince;
+        let force = (downFor / this.timeToForce);
+        if(force > this.maxForce) {
+            force = this.maxForce;
+        }
+        const forceScale = force / this.maxForce;
+        const alphaRest = (((forceScale)/10)*4);
+        this.arrow.alpha = .3 + alphaRest;
+        this.arrow.scale.x = 1 + (forceScale*.5);
+        this.arrow.scale.y = 1 + (forceScale * 15);
     }
 }
