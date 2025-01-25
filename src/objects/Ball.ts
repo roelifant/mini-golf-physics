@@ -19,6 +19,7 @@ export class Ball implements IActiveGameObject, ITriggerGameObject {
     public angle: number = 0;
     public arrowContainer: Container = new Container();
     public color: number;
+    public hit = false;
 
     private timeToForce = 1200;
     private maxForce: number = 1.5;
@@ -158,10 +159,13 @@ export class Ball implements IActiveGameObject, ITriggerGameObject {
         }
 
         // end turn if needed
-        if(this.momentum.length == 0 && this.hasBeenLaunched && this.controlling) {
-            this.controlling = false;
-            this.hasBeenLaunched = false;
-            (<MiniGolfScene>GameService.instance.scene).endTurn();
+        if(this.momentum.length == 0){
+            this.hit = false;
+            if(this.hasBeenLaunched && this.controlling) {
+                this.controlling = false;
+                this.hasBeenLaunched = false;
+                (<MiniGolfScene>GameService.instance.scene).waitForTurnToEnd();
+            }
         }
 
         // trail
@@ -180,10 +184,10 @@ export class Ball implements IActiveGameObject, ITriggerGameObject {
             const overlapVector = Vector.fromPoint(data.overlapV);
             // calculate the position this object should have to negate the collision
             const negatedPosition = this.position.subtract(overlapVector);
+            // calculate the difference (transformation) from current position to negated position
+            const negatedDiff = negatedPosition.subtract(this.position);
 
-            if (this.momentum.length > 0) {
-                // calculate the difference (transformation) from current position to negated position
-                const negatedDiff = negatedPosition.subtract(this.position);
+            if (this.momentum.length > 0 && negatedDiff.length > 0) {
                 // bounce the momentum off the line of the collision object
                 this.momentum = this.momentum.bounceOffLine(negatedDiff.perpendicular2D());
 
@@ -200,6 +204,38 @@ export class Ball implements IActiveGameObject, ITriggerGameObject {
                 const wall = <BreakableWall>collider.owner;
                 wall.hit();
             }
+            return;
+        }
+
+        if(collider.hasTag('ball') && (this.controlling || this.hit)) {
+            // get the overlap into a vector
+            const overlapVector = Vector.fromPoint(data.overlapV);
+            // calculate the position this object should have to negate the collision
+            const negatedPosition = this.position.subtract(overlapVector);
+            // calculate the difference (transformation) from current position to negated position
+            const negatedDiff = negatedPosition.subtract(this.position);
+
+            if (this.momentum.length > 0 && negatedDiff.length > 0) {
+                const startSpeed = this.momentum.length;
+                // bounce the momentum off the line of the collision object
+                let bounceOffVector = this.momentum.bounceOffLine(negatedDiff.perpendicular2D());
+
+                // add extra drag
+                if (this.momentum.length !== 0) {
+                    this.momentum = this.momentum.divide(2).subtractLength(this.collisionDrag);
+                    bounceOffVector = bounceOffVector.divide(2).subtractLength(this.collisionDrag);
+                }
+                // divide by two
+                this.momentum = this.momentum.add(bounceOffVector);
+                // add momentum to other ball
+                const otherBall = <Ball>collider.owner;
+                const otherBallExtraMomentum = negatedDiff.opposite().setLength(1).scale(startSpeed).subtractLength(this.collisionDrag);
+                otherBall.momentum = otherBall.momentum.add(otherBallExtraMomentum);
+                otherBall.hit = true;
+            }
+
+            // move the ball outside of the wall
+            this.position = negatedPosition;
         }
     }
 

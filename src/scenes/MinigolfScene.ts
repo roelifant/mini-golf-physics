@@ -32,6 +32,7 @@ export class MiniGolfScene extends Scene {
     private turn: number;
     private round: number;
     private currentSpawn: number = 0;
+    private waitingForTurnToEnd: boolean = false;
 
     constructor(level: Level) {
         super();
@@ -78,6 +79,20 @@ export class MiniGolfScene extends Scene {
             ball.update(deltaTime);
         }
         CollisionService.instance.update();
+
+        if(this.waitingForTurnToEnd) {
+            let moving = false;
+            for (const ball of this.balls) {
+                if(ball.momentum.length > 0) {
+                    moving = true;
+                }
+            }
+
+            if(!moving) {
+                this.waitingForTurnToEnd = false;
+                this.endTurn();
+            }
+        }
     }
 
     private addGameObject(object: IGameObject, container: Container | null = null): void {
@@ -127,7 +142,14 @@ export class MiniGolfScene extends Scene {
         }
     }
 
-    public endTurn() {
+    public waitForTurnToEnd() {
+        this.waitingForTurnToEnd = true;
+    }
+
+    private endTurn() {
+        for (const ball of this.balls) {
+            ball.hit = false;
+        }
         this.turn++;
         if(this.turn > GameService.instance.players.length) {
             this.turn = 1;
@@ -148,6 +170,5 @@ export class MiniGolfScene extends Scene {
             throw new Error('there is no ball');
         }
         ball.control();
-        console.log('control');
     }
 }

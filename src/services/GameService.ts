@@ -44,15 +44,15 @@ export class GameService {
     }
 
     private playerColors: Array<number> = [
-        0xf02929,
-        0x2c62f5,
-        0x4db349,
-        0xa54ac7,
-        0xffc130,
-        0x39e6d7,
-        0x8a7353,
-        0xf084ce,
-        0x493663
+        0xf02929, // red
+        0x2c62f5, // blue
+        0xffc130, // yellow
+        0x4db349, // green
+        0xf084ce, // pink
+        0x39e6d7, // cyan
+        0xa54ac7, // purple
+        0x634a36, // brown
+        0x493663 // dark
     ];
 
     public setupPlayers(count: number): void {
