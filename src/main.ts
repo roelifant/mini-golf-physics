@@ -2,6 +2,7 @@ import { testLevel } from './levels/TestLevel';
 import { MouseListener } from './listeners/MouseListener';
 import { PixiManager } from './pixi/PixiManager';
 import { MiniGolfScene } from './scenes/MinigolfScene';
+import { GameService } from './services/GameService';
 import './style.css'
 
 async function startUp() {
@@ -12,6 +13,8 @@ async function startUp() {
     canvas,
     elementToResizeTo: body
   });
+
+  GameService.instance.setupPlayers(6);
 
   PixiManager.registerScenes([
       new MiniGolfScene(testLevel),

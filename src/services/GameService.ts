@@ -1,3 +1,4 @@
+import { Player } from "../game/Player";
 import { MouseListener } from "../listeners/MouseListener";
 import { Vector } from "../math/vector/Vector";
 import { PixiManager } from "../pixi/PixiManager";
@@ -10,7 +11,9 @@ export class GameService {
      * The Singleton's constructor should always be private to prevent direct
      * construction calls with the `new` operator.
      */
-    private constructor() { }
+    private constructor() {
+        this.players = [];
+    }
 
     /**
      * The static getter that controls access to the singleton instance.
@@ -26,6 +29,8 @@ export class GameService {
         return GameService.#instance;
     }
 
+    public players: Array<Player>;
+
     public get scene(): Scene {
         return PixiManager.scene;
     }
@@ -36,5 +41,27 @@ export class GameService {
         const zoom = this.scene.scale;
 
         return mousePosition.subtract(canvasDimensions).scale(1/zoom).add(this.scene.pan);
+    }
+
+    private playerColors: Array<number> = [
+        0xf02929,
+        0x2c62f5,
+        0x4db349,
+        0xa54ac7,
+        0xffc130,
+        0x39e6d7,
+        0x8a7353,
+        0xf084ce,
+        0x493663
+    ];
+
+    public setupPlayers(count: number): void {
+        for (let i = 0; i < count; i++) {
+            const color = this.playerColors.shift();
+            if(!color) {
+                throw new Error('Cannot have this many players');
+            }
+            this.players.push(new Player('Player '+i, color));
+        }
     }
 }

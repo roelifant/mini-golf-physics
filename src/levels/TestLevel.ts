@@ -3,7 +3,7 @@ import { ICircle, ICurveablePolygon, IEllipse, IPolygon, IRectangle, Shape } fro
 import { MathUtils } from "../math/MathUtils";
 import { Vector } from "../math/vector/Vector";
 import { IPoint } from "../math/vector/VectorInterfaces";
-import { Level } from "./Level";
+import { Level } from "../game/Level";
 
 const horizontalWallShape = <IRectangle>{
     type: Shape.RECTANGLE,

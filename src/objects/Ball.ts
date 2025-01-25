@@ -4,10 +4,11 @@ import { IActiveGameObject, ITriggerGameObject } from "../contracts/Objects";
 import { Vector } from "../math/vector/Vector";
 import { Shape } from "../contracts/Shapes";
 import { Scene } from "../pixi/Scene";
-import { Collider } from "../colliders/Collider";
+import { Collider } from "../game/Collider";
 import { GameService } from "../services/GameService";
 import { MouseListener } from "../listeners/MouseListener";
 import { BreakableWall } from "./BreakableWall";
+import { MiniGolfScene } from "../scenes/MinigolfScene";
 
 export class Ball implements IActiveGameObject, ITriggerGameObject {
     public visuals: Container<ContainerChild> | Graphics;
@@ -17,11 +18,14 @@ export class Ball implements IActiveGameObject, ITriggerGameObject {
     public collisionDrag: number;
     public angle: number = 0;
     public arrowContainer: Container = new Container();
+    public color: number;
 
     private timeToForce = 1200;
     private maxForce: number = 1.5;
     private trail: Container = new Container();
     private arrow: Graphics = new Graphics();
+    private hasBeenLaunched: boolean = false;
+    private controlling: boolean = false;
 
     public get position(): Vector {
         return new Vector(this.visuals.position.x, this.visuals.position.y);
@@ -52,38 +56,40 @@ export class Ball implements IActiveGameObject, ITriggerGameObject {
     }
 
     public get canLaunch(): boolean {
-        return this.momentum.length === 0;
+        return this.momentum.length === 0 && !this.hasBeenLaunched && this.controlling;
     }
 
-    constructor(scene: Scene, position: Vector, radius: number) {
+    constructor(scene: Scene, position: Vector, radius: number, color: number) {
+        this.color = color;
+
         // make ball
         const ball = (new Graphics())
             .circle(0, 0, radius)
-            .fill(0x0000ff);
+            .fill(this.color);
 
         // make trail
         const trailSegment1 = (new Graphics())
             .rect(0, 0, radius * 2, radius / 2)
-            .fill(0x0000ff);
+            .fill(this.color);
         this.trail.addChild(trailSegment1);
         const trailSegment2 = (new Graphics())
             .rect(0, 0, radius * 2, radius)
-            .fill(0x0000ff);
+            .fill(this.color);
         trailSegment2.alpha = 0.2;
         this.trail.addChild(trailSegment2);
         const trailSegment3 = (new Graphics())
             .rect(0, 0, radius * 2, (radius / 2) * 3)
-            .fill(0x0000ff);
+            .fill(this.color);
         trailSegment3.alpha = 0.2;
         this.trail.addChild(trailSegment3);
         const trailSegment4 = (new Graphics())
             .rect(0, 0, radius * 2, radius * 2)
-            .fill(0x0000ff);
+            .fill(this.color);
         trailSegment4.alpha = 0.2;
         this.trail.addChild(trailSegment4);
         const trailSegment5 = (new Graphics())
             .rect(0, 0, radius * 2, radius * 3)
-            .fill(0x0000ff);
+            .fill(this.color);
         trailSegment5.alpha = 0.2;
         this.trail.addChild(trailSegment5);
         this.trail.alpha = 0;
@@ -98,7 +104,7 @@ export class Ball implements IActiveGameObject, ITriggerGameObject {
                 {x: 10, y: 0},
                 {x: 0, y: -10},
             ])
-            .fill(0x0000ff);
+            .fill(this.color);
         this.arrowContainer.addChild(this.arrow);
         this.arrowContainer.pivot.y = radius + 10;
 
@@ -147,7 +153,16 @@ export class Ball implements IActiveGameObject, ITriggerGameObject {
         this.hideArrow();
 
         // drag
-        this.momentum = this.momentum.subtractLength(this.drag * deltaTime);
+        if(this.momentum.length !== 0) {
+            this.momentum = this.momentum.subtractLength(this.drag * deltaTime);
+        }
+
+        // end turn if needed
+        if(this.momentum.length == 0 && this.hasBeenLaunched && this.controlling) {
+            this.controlling = false;
+            this.hasBeenLaunched = false;
+            (<MiniGolfScene>GameService.instance.scene).endTurn();
+        }
 
         // trail
         if (this.momentum.length < .2) {
@@ -196,6 +211,11 @@ export class Ball implements IActiveGameObject, ITriggerGameObject {
         const direction = target.subtract(this.position).normalize();
 
         this.momentum = direction.scale(force);
+        this.hasBeenLaunched = true;
+    }
+
+    public control() {
+        this.controlling = true;
     }
 
     private hideTrail() {
