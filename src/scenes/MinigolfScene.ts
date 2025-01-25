@@ -29,8 +29,10 @@ export class MiniGolfScene extends Scene {
             });
 
         const floorContainer = new Container();
+        const ballContainer = new Container();
         const wallContainer = new Container();
         this.add(floorContainer);
+        this.add(ballContainer);
         this.add(wallContainer);
 
         const floorShape = <IRectangle>{
@@ -127,8 +129,8 @@ export class MiniGolfScene extends Scene {
             new Wall(curvedConcaveWallShape, new Vector(500, 300), Vector.utils.degreesToRadians(-90-45)),
 
         ], wallContainer);
-        const ball = new Ball(this, 0, 0, 25);
-        this.addGameObject(ball);
+        const ball = new Ball(this, 0, 0, 20);
+        this.addGameObject(ball, ballContainer);
         this.balls.push(ball);
 
         MouseListener.registerClickHandler((event: IMouseListenerClickEvent) => {

@@ -14,6 +14,8 @@ export class Ball implements IActiveGameObject {
     public collisionDrag: number;
     public angle: number = 0;
 
+    private trail: Container = new Container();
+
     public get position(): Vector {
         return new Vector(this.visuals.position.x, this.visuals.position.y);
     }
@@ -43,9 +45,41 @@ export class Ball implements IActiveGameObject {
     }
 
     constructor (scene: Scene, x: number, y: number, radius: number) {
-            this.visuals = (new Graphics())
+            const ball = (new Graphics())
             .circle(0, 0, radius)
             .fill(0x0000ff);
+
+            const trailSegment1 = (new Graphics())
+                .rect(0,0, radius*2, radius/2)
+                .fill(0x0000ff);
+            this.trail.addChild(trailSegment1);
+            const trailSegment2 = (new Graphics())
+                .rect(0,0, radius*2, radius)
+                .fill(0x0000ff);
+            trailSegment2.alpha = 0.2;
+            this.trail.addChild(trailSegment2);
+            const trailSegment3 = (new Graphics())
+                .rect(0,0, radius*2, (radius/2)*3)
+                .fill(0x0000ff);
+            trailSegment3.alpha = 0.2;
+            this.trail.addChild(trailSegment3);
+            const trailSegment4 = (new Graphics())
+                .rect(0,0, radius*2, radius*2)
+                .fill(0x0000ff);
+            trailSegment4.alpha = 0.2;
+            this.trail.addChild(trailSegment4);
+            const trailSegment5 = (new Graphics())
+                .rect(0,0, radius*2, radius*3)
+                .fill(0x0000ff);
+            trailSegment5.alpha = 0.2;
+            this.trail.addChild(trailSegment5);
+            this.trail.alpha = 0;
+            this.trail.pivot.x = radius;
+            this.trail.pivot.y = 0;
+
+            this.visuals = new Container;
+            this.visuals.addChild(ball);
+            this.visuals.addChild(this.trail);
             scene.add(this.visuals);
     
             this.visuals.position.x = x;
@@ -67,12 +101,25 @@ export class Ball implements IActiveGameObject {
     }
 
     public update(deltaTime: number): void {
+
+        this.trail.angle += 1;
+
         this.position = this.position.add(this.momentum.scale(deltaTime));
 
-        // drag
-        if(this.momentum.length !== 0) {
-            this.momentum = this.momentum.subtractLength(this.drag * deltaTime);
+        if(this.momentum.length === 0) {
+            this.hideTrail();
+            return;
         }
+
+        // drag
+        this.momentum = this.momentum.subtractLength(this.drag * deltaTime);
+
+        // trail
+        if(this.momentum.length < .2) {
+            this.hideTrail();
+            return;
+        }
+        this.handleTrail();
     }
 
     public onCollision(collider: ICollider, data: ICollisionData): void {
@@ -102,8 +149,31 @@ export class Ball implements IActiveGameObject {
     }
 
     public launch(target: Vector, magnitude: number) {
+        const maxForce = 1.5;
+        let force = magnitude/1200;
+        if(force > maxForce) {
+            force = maxForce;
+        }
         const direction = target.subtract(this.position).normalize();
 
-        this.momentum = direction.scale(magnitude/1500);
+        this.momentum = direction.scale(force);
+    }
+
+    private hideTrail() {
+        this.trail.alpha = 0;
+    }
+
+    private handleTrail() {
+        const maxLength = 15;
+        const maxVisibility = 15;
+        let length = this.momentum.length * 2.5;
+        if(length > maxLength) {
+            length = maxLength;
+        }
+
+        const angle = this.momentum.toAngle();
+        this.trail.rotation = angle;
+        this.trail.alpha = length / maxVisibility;
+        this.trail.scale.y = length / 2;
     }
 }
