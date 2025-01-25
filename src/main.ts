@@ -14,7 +14,7 @@ async function startUp() {
     elementToResizeTo: body
   });
 
-  GameService.instance.setupPlayers(6);
+  GameService.instance.setupPlayers(4);
 
   PixiManager.registerScenes([
       new MiniGolfScene(testLevel),

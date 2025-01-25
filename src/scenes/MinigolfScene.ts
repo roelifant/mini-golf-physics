@@ -107,24 +107,37 @@ export class MiniGolfScene extends Scene {
         for (const object of this.level.definition.contents) {
             if (object.type === LevelObjectType.FLOOR) {
                 const floorDefinition = <ILevelShapeObject>object;
-                this.addGameObject(new Floor(floorDefinition.shape, floorDefinition.position, floorDefinition.angle ?? 0), this.floorContainer)
+                this.addGameObject(new Floor(
+                    floorDefinition.shape,
+                    Vector.fromPoint(floorDefinition.position),
+                    floorDefinition.angle ?? 0
+                ), this.floorContainer)
                 continue;
             }
 
             if (object.type === LevelObjectType.WALL) {
                 const wallDefinition = <ILevelShapeObject>object;
-                this.addGameObject(new Wall(wallDefinition.shape, wallDefinition.position, wallDefinition.angle ?? 0), this.wallContainer)
+                this.addGameObject(new Wall(
+                    wallDefinition.shape,
+                    Vector.fromPoint(wallDefinition.position),
+                    wallDefinition.angle ?? 0
+                ), this.wallContainer)
                 continue;
             }
 
             if (object.type === LevelObjectType.BREAKABLE_WALL) {
                 const wallDefinition = <ILevelBreakableWallObject>object;
-                this.addGameObject(new BreakableWall(wallDefinition.shape, wallDefinition.position, wallDefinition.angle ?? 0, wallDefinition.hitpoints), this.breakableWallContainer)
+                this.addGameObject(new BreakableWall(
+                    wallDefinition.shape,
+                    Vector.fromPoint(wallDefinition.position),
+                    wallDefinition.angle ?? 0,
+                    wallDefinition.hitpoints
+                ), this.breakableWallContainer)
                 continue;
             }
 
             if (object.type === LevelObjectType.SPAWN) {
-                this.spawns.push(object.position);
+                this.spawns.push(Vector.fromPoint(object.position));
             }
         }
     }

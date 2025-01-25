@@ -1,4 +1,4 @@
-import { Vector } from "../math/vector/Vector";
+import { IPoint } from "../math/vector/VectorInterfaces";
 import { DefinedShape } from "./Shapes";
 
 export enum LevelObjectType {
@@ -16,7 +16,7 @@ export enum LevelSize {
 
 export interface ILevelObject {
     type: LevelObjectType
-    position: Vector
+    position: IPoint
     angle?: number
 }
 
@@ -30,8 +30,10 @@ export interface ILevelBreakableWallObject extends ILevelShapeObject {
     hitpoints?: number
 }
 
+export type LevelContents = Array<ILevelObject|ILevelShapeObject|ILevelBreakableWallObject>;
+
 export interface ILevelDefinition {
     name: string,
     size: LevelSize
-    contents: Array<ILevelObject|ILevelShapeObject|ILevelBreakableWallObject>
+    contents: LevelContents
 }

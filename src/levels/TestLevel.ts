@@ -1,7 +1,6 @@
 import { LevelObjectType, LevelSize } from "../contracts/Levels";
 import { ICircle, ICurveablePolygon, IEllipse, IPolygon, IRectangle, Shape } from "../contracts/Shapes";
 import { MathUtils } from "../math/MathUtils";
-import { Vector } from "../math/vector/Vector";
 import { IPoint } from "../math/vector/VectorInterfaces";
 import { Level } from "../game/Level";
 
@@ -82,78 +81,78 @@ export const testLevel = new Level('test', LevelSize.SMALL, [
             width: 1100,
             height: 700
         },
-        position: new Vector(0, 0)
+        position: {x: 0, y: 0}
     },
     {
         type: LevelObjectType.WALL,
         shape: horizontalWallShape,
-        position: new Vector(0, 350)
+        position: {x: 0, y: 350}
     },
     {
         type: LevelObjectType.WALL,
         shape: horizontalWallShape,
-        position: new Vector(0, -350)
+        position: {x: 0, y: -350}
     },
     {
         type: LevelObjectType.WALL,
         shape: verticalWallShape,
-        position: new Vector(-550, 0)
+        position: {x: -550, y: 0}
     },
     {
         type: LevelObjectType.WALL,
         shape: verticalWallShape,
-        position: new Vector(550, 0)
+        position: {x: 550, y: 0}
     },
     {
         type: LevelObjectType.WALL,
         shape: curvedConcaveWallShape,
-        position: new Vector(-500, -300),
+        position: {x: -500, y: -300},
         angle: MathUtils.degreesToRadians(45)
     },
     {
         type: LevelObjectType.WALL,
         shape: curvedConcaveWallShape,
-        position: new Vector(500, -300),
+        position: {x: 500, y: -300},
         angle: MathUtils.degreesToRadians(90+45)
     },
     {
         type: LevelObjectType.WALL,
         shape: curvedConcaveWallShape,
-        position: new Vector(-500, 300),
+        position: {x: -500, y: 300},
         angle: MathUtils.degreesToRadians(-45)
     },
     {
         type: LevelObjectType.WALL,
         shape: curvedConcaveWallShape,
-        position: new Vector(500, 300),
+        position: {x: 500, y: 300},
         angle: MathUtils.degreesToRadians(-90-45)
     },
     {
         type: LevelObjectType.BREAKABLE_WALL,
         shape: circleWallShape,
-        position: new Vector(400, 0),
+        position: {x: 400, y: 0},
         hitpoints: 3
     },
     {
         type: LevelObjectType.BREAKABLE_WALL,
         shape: ellipseWallShape,
-        position: new Vector(-400, 0),
+        position: {x: -400, y: 0},
         hitpoints: 3
     },
     {
         type: LevelObjectType.BREAKABLE_WALL,
         shape: triangleWallShape,
-        position: new Vector(0, 200),
+        position: {x: 0, y: 200},
         hitpoints: 3
     },
     {
         type: LevelObjectType.BREAKABLE_WALL,
         shape: circleWallShape,
-        position: new Vector(0, -200),
+        position: {x: 0, y: -200},
         hitpoints: 3
     },
     {
         type: LevelObjectType.SPAWN,
-        position: new Vector(0, 0),
+        position: {x: 0, y: 0},
     },
 ]);
