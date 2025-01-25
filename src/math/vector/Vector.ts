@@ -493,6 +493,9 @@ export class Vector {
         if (this.dimensions !== 2) {
             throw new DimensionsVectorError('This method only works for two-dimensional vectors!');
         }
+        if(this.length === 0) {
+            return 0;
+        }
         const origin = new Vector(0, -1)
         let radians = Math.acos(this.dot(origin) / (this.length * origin.length))
         

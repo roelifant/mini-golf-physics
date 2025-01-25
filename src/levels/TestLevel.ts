@@ -96,12 +96,12 @@ export const testLevel = new Level('test', LevelSize.SMALL, [
     {
         type: LevelObjectType.WALL,
         shape: verticalWallShape,
-        position: {x: -550, y: 0}
+        position: {x: -550, y: 50}
     },
     {
         type: LevelObjectType.WALL,
         shape: verticalWallShape,
-        position: {x: 550, y: 0}
+        position: {x: 550, y: -50}
     },
     {
         type: LevelObjectType.WALL,
@@ -144,6 +144,28 @@ export const testLevel = new Level('test', LevelSize.SMALL, [
         shape: triangleWallShape,
         position: {x: 0, y: 200},
         hitpoints: 3
+    },
+    {
+        type: LevelObjectType.BREAKABLE_WALL,
+        shape: {
+            type: Shape.RECTANGLE,
+            width: 20,
+            height: 60
+        },
+        position: {x: -100, y: 100},
+        angle: MathUtils.degreesToRadians(30),
+        hitpoints: 2
+    },
+    {
+        type: LevelObjectType.BREAKABLE_WALL,
+        shape: {
+            type: Shape.RECTANGLE,
+            width: 20,
+            height: 60
+        },
+        position: {x: 100, y: -100},
+        angle: MathUtils.degreesToRadians(180),
+        hitpoints: 2
     },
     {
         type: LevelObjectType.BREAKABLE_WALL,
