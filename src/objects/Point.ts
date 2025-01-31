@@ -53,4 +53,9 @@ export class Point extends StaticShapeObject implements IActiveGameObject {
         (<MiniGolfScene>GameService.instance.scene)
             .triggerRipple(this.position.copy(), player.color);
     }
+
+    public destroy() {
+        this.collider?.destroy();
+        this.visuals.destroy();
+    }
 }

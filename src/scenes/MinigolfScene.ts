@@ -117,6 +117,18 @@ export class MiniGolfScene extends Scene {
 
             return true;
         });
+
+        // check points
+        const unClaimedPoints = this.points.filter(point => !point.claimed);
+        if(unClaimedPoints.length === 1) {
+            const remainingPoint = unClaimedPoints[0];
+            this.gameObjects = this.gameObjects.filter(object => object !== remainingPoint);
+            remainingPoint.destroy();
+            const position = remainingPoint.position.copy();
+            this.points = this.points.filter(point => point.claimed);
+            // spawn hole there
+            this.addGameObject(new Hole(position, 2), this.holeContainer);
+        }
     }
 
     public triggerRipple(position: Vector, color: number) {

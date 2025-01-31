@@ -110,7 +110,7 @@ export const testLevel = new Level('test', LevelSize.SMALL, [
         position: {x: 0, y: 0},
     },
     {
-        type: LevelObjectType.HOLE,
+        type: LevelObjectType.POINT,
         position: {x: 300, y: 0}
     },
     {

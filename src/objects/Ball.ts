@@ -355,8 +355,6 @@ export class Ball implements IActiveGameObject, ITriggerGameObject {
         this.inHole = true;
         this.holeVanishingPoint = this.position.reflectOverPoint(hole.position);
         this.momentum = hole.position.subtract(this.holeVanishingPoint).setLength(this.momentum.length);
-        hole.position.log();
-        this.holeVanishingPoint.log();
     }
 
     private endTurn() {
