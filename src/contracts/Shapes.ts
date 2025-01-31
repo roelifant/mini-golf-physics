@@ -1,5 +1,3 @@
-import { IPoint } from "../math/vector/VectorInterfaces";
-
 export type DefinedShape = ICircle | IEllipse | IRectangle | IPolygon | ICurveablePolygon;
 
 export enum Shape {
@@ -33,8 +31,9 @@ export interface IRectangle extends IShape {
     height: number,
 }
 
-export interface IPolygonPoint extends IPoint {
-    z: undefined,
+export interface IPolygonPoint {
+    x: number,
+    y: number,
 }
 
 export interface IPolygon extends IShape {
