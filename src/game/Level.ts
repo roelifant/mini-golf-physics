@@ -12,6 +12,14 @@ export class Level {
             size,
             contents
         };
+    }
+
+    public copy(): Level {
+        const copiedDefinition = <ILevelDefinition>JSON.parse(JSON.stringify(this.definition));
+        return new Level(copiedDefinition.name, copiedDefinition.size, copiedDefinition.contents)
+    }
+
+    public randomize(): void {
         const rng = Math.random();
         if(rng < 0.66) {
             if(rng < 0.33) {

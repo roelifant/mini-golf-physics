@@ -159,6 +159,7 @@ export class Ball implements IActiveGameObject, ITriggerGameObject {
                 this.hasBeenLaunched &&
                 this.controlling
             ) {
+                this.visuals.alpha = 0;
                 this.endTurn();
                 return;
             

@@ -17,7 +17,7 @@ import { Point } from "../objects/Point";
 import { Hole } from "../objects/Hole";
 
 export class MiniGolfScene extends Scene {
-    public key = 'minigolf';
+    public key: string;
     public centered = true;
 
     public get currentPlayer(): Player {
@@ -43,8 +43,9 @@ export class MiniGolfScene extends Scene {
     private balls: Array<Ball> = [];
     private spawns: Array<Vector> = [];
 
-    constructor(level: Level) {
+    constructor(level: Level, key: string) {
         super();
+        this.key = key;
         this.level = level;
         this.turn = 0;
         this.round = 0;
@@ -131,10 +132,23 @@ export class MiniGolfScene extends Scene {
         }
     }
 
+    public onEnd(): void {
+        for (const object of this.gameObjects) {
+            if(!!object.collider) {
+                object.collider.destroy();
+            }
+            object.visuals.destroy();
+        }
+    }
+
     public triggerRipple(position: Vector, color: number) {
         const ripple = new Ripple(position, color);
         this.ripples.push(ripple);
         this.addGameObject(ripple, this.effectsContainer);
+    }
+
+    public waitForTurnToEnd() {
+        this.waitingForTurnToEnd = true;
     }
 
     private addGameObject(object: IGameObject, container: Container | null = null): void {
@@ -210,23 +224,7 @@ export class MiniGolfScene extends Scene {
         }
     }
 
-    public waitForTurnToEnd() {
-        this.waitingForTurnToEnd = true;
-    }
-
-    private endTurn() {
-        for (const ball of this.balls) {
-            ball.hit = false;
-        }
-        this.turn++;
-        if(this.turn > GameService.instance.players.length) {
-            this.turn = 1;
-            this.round++;
-        }
-        this.startTurn();
-    }
-
-    public startTurn() {
+    private startTurn() {
         // check if the current player has a ball
         const player = this.currentPlayer;
         let ball = this.currentPlayer.ball;
@@ -238,5 +236,28 @@ export class MiniGolfScene extends Scene {
             throw new Error('there is no ball');
         }
         ball.control();
+    }
+
+    private endTurn() {
+        let ballInHole = false;
+        for (const ball of this.balls) {
+            ball.hit = false;
+            if(ball.inHole) {
+                ballInHole = true;
+            }
+        }
+
+        // check if a ball is in the hole
+        if(ballInHole) {
+            GameService.instance.nextLevel();
+            return;
+        }
+
+        this.turn++;
+        if(this.turn > GameService.instance.players.length) {
+            this.turn = 1;
+            this.round++;
+        }
+        this.startTurn();
     }
 }

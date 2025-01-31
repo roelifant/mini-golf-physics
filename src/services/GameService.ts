@@ -1,8 +1,10 @@
+import { SceneFactory } from "../factories/SceneFactory";
 import { Player } from "../game/Player";
 import { MouseListener } from "../listeners/MouseListener";
 import { Vector } from "../math/vector/Vector";
 import { PixiManager } from "../pixi/PixiManager";
 import { Scene } from "../pixi/Scene";
+import { MiniGolfScene } from "../scenes/MinigolfScene";
 
 export class GameService {
     static #instance: GameService;
@@ -13,6 +15,7 @@ export class GameService {
      */
     private constructor() {
         this.players = [];
+        this.levelScenes = [];
     }
 
     /**
@@ -30,6 +33,8 @@ export class GameService {
     }
 
     public players: Array<Player>;
+    public levelScenes: Array<MiniGolfScene>;
+    private currentLevel: number = 0;
 
     public get scene(): Scene {
         return PixiManager.scene;
@@ -55,13 +60,51 @@ export class GameService {
         0x493663 // dark
     ];
 
-    public setupPlayers(count: number): void {
+    public async setup() {
+        // start pixi
+        const body = <HTMLBodyElement>document.querySelector('body');
+        const canvas = <HTMLCanvasElement>document.querySelector('#game-canvas');
+
+        await PixiManager.init({
+            canvas,
+            elementToResizeTo: body
+        });
+
+        MouseListener.initialize(canvas);
+        window.addEventListener('resize', PixiManager.resize);
+
+        this.setupPlayers(4);
+        this.setupLevels(3);
+        await PixiManager.openScene(this.levelScenes[this.currentLevel].key);
+    }
+
+    public nextLevel() {
+        for (const player of this.players) {
+            player.ball = undefined;
+        }
+        if(this.currentLevel === this.levelScenes.length-1) {
+            const winner = this.players.sort((a, b) => b.points - a.points)[0];
+            alert(winner.name + ' won!');
+            PixiManager.endScene(this.levelScenes[this.currentLevel].key);
+            return;
+        }
+        this.currentLevel++;
+        PixiManager.changeScene(this.levelScenes[this.currentLevel].key);
+    }
+
+    private setupPlayers(count: number): void {
         for (let i = 0; i < count; i++) {
             const color = this.playerColors.shift();
             if(!color) {
                 throw new Error('Cannot have this many players');
             }
-            this.players.push(new Player('Player '+i, color));
+            this.players.push(new Player('Player '+(i+1), color));
         }
+    }
+
+    private setupLevels(count: number){
+        const levels = SceneFactory.generateScenes(count);
+        PixiManager.registerScenes(levels);
+        this.levelScenes = levels;
     }
 }
