@@ -41,9 +41,10 @@ export abstract class StaticShapeObject implements IGameObject {
             const rectangle = <IRectangle>shape;
             const visual = (new Graphics())
             .rect(0, 0, rectangle.width, rectangle.height)
-            .fill(this.color);
+            .fill(0xffffff);
             visual.pivot.x = rectangle.width/2;
             visual.pivot.y = rectangle.height/2;
+            visual.tint = this.color;
             return visual;
         }
 
@@ -51,7 +52,8 @@ export abstract class StaticShapeObject implements IGameObject {
             const circle = <ICircle>shape;
             const visual = (new Graphics())
             .circle(0, 0, circle.radius)
-            .fill(this.color);
+            .fill(0xffffff);
+            visual.tint = this.color;
             return visual;
         }
 
@@ -59,7 +61,8 @@ export abstract class StaticShapeObject implements IGameObject {
             const ellipse = <IEllipse>shape;
             const visual = (new Graphics())
             .ellipse(0, 0, ellipse.radius.x, ellipse.radius.y)
-            .fill(this.color);
+            .fill(0xffffff);
+            visual.tint = this.color;
             return visual;
         }
 
@@ -67,7 +70,8 @@ export abstract class StaticShapeObject implements IGameObject {
             const polygon = <IPolygon>shape;
             const visual = (new Graphics())
             .poly(polygon.points)
-            .fill(this.color);
+            .fill(0xffffff);
+            visual.tint = this.color;
             return visual;
         }
 
@@ -133,7 +137,8 @@ export abstract class StaticShapeObject implements IGameObject {
                 visual.lineTo(point.x, point.y);
             }
 
-            visual.fill(this.color);
+            visual.fill(0xffffff);
+            visual.tint = this.color;
             return visual;
     }
 }

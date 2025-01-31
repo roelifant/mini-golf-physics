@@ -9,6 +9,8 @@ import { GameService } from "../services/GameService";
 import { MouseListener } from "../listeners/MouseListener";
 import { BreakableWall } from "./BreakableWall";
 import { MiniGolfScene } from "../scenes/MinigolfScene";
+import { Point } from "./Point";
+import { Player } from "../game/Player";
 
 export class Ball implements IActiveGameObject, ITriggerGameObject {
     public visuals: Container<ContainerChild> | Graphics;
@@ -20,6 +22,7 @@ export class Ball implements IActiveGameObject, ITriggerGameObject {
     public arrowContainer: Container = new Container();
     public color: number;
     public hit = false;
+    public owner: Player|undefined;
 
     private timeToForce = 1200;
     private maxForce: number = 1.5;
@@ -176,64 +179,17 @@ export class Ball implements IActiveGameObject, ITriggerGameObject {
 
     public onCollision(collider: ICollider, data: ICollisionData): void {
         if (collider.hasTag('wall')) {
-            // touching wall
-
-            // get the overlap into a vector
-            const overlapVector = Vector.fromPoint(data.overlapV);
-            // calculate the position this object should have to negate the collision
-            const negatedPosition = this.position.subtract(overlapVector);
-            // calculate the difference (transformation) from current position to negated position
-            const negatedDiff = negatedPosition.subtract(this.position);
-
-            if (this.momentum.length > 0 && negatedDiff.length > 0) {
-                // bounce the momentum off the line of the collision object
-                this.momentum = this.momentum.bounceOffLine(negatedDiff.perpendicular2D());
-
-                // add extra drag
-                if (this.momentum.length !== 0) {
-                    this.momentum = this.momentum.subtractLength(this.collisionDrag);
-                }
-            }
-
-            // move the ball outside of the wall
-            this.position = negatedPosition;
-
-            if(collider.hasTag('breakable')) {
-                const wall = <BreakableWall>collider.owner;
-                wall.hit();
-            }
+            this.handleWallCollision(collider, data);
             return;
         }
 
         if(collider.hasTag('ball') && (this.controlling || this.hit)) {
-            // get the overlap into a vector
-            const overlapVector = Vector.fromPoint(data.overlapV);
-            // calculate the position this object should have to negate the collision
-            const negatedPosition = this.position.subtract(overlapVector);
-            // calculate the difference (transformation) from current position to negated position
-            const negatedDiff = negatedPosition.subtract(this.position);
+            this.handleBallCollision(collider, data);
+            return;
+        }
 
-            if (this.momentum.length > 0 && negatedDiff.length > 0) {
-                const startSpeed = this.momentum.length;
-                // bounce the momentum off the line of the collision object
-                let bounceOffVector = this.momentum.bounceOffLine(negatedDiff.perpendicular2D());
-
-                // add extra drag
-                if (this.momentum.length !== 0) {
-                    this.momentum = this.momentum.divide(2).subtractLength(this.collisionDrag);
-                    bounceOffVector = bounceOffVector.divide(2).subtractLength(this.collisionDrag);
-                }
-                // divide by two
-                this.momentum = this.momentum.add(bounceOffVector);
-                // add momentum to other ball
-                const otherBall = <Ball>collider.owner;
-                const otherBallExtraMomentum = negatedDiff.opposite().setLength(1).scale(startSpeed).subtractLength(this.collisionDrag);
-                otherBall.momentum = otherBall.momentum.add(otherBallExtraMomentum);
-                otherBall.hit = true;
-            }
-
-            // move the ball outside of the wall
-            this.position = negatedPosition;
+        if(collider.hasTag('point') && this.momentum.length > 0) {
+            this.handlePointCollision(collider);
         }
     }
 
@@ -299,5 +255,70 @@ export class Ball implements IActiveGameObject, ITriggerGameObject {
         this.arrow.alpha = .3 + alphaRest;
         this.arrow.scale.x = 1 + (forceScale*.5);
         this.arrow.scale.y = 1 + (forceScale * 15);
+    }
+
+    private handleWallCollision(collider: ICollider, data: ICollisionData) {
+        // touching wall
+
+        // get the overlap into a vector
+        const overlapVector = Vector.fromPoint(data.overlapV);
+        // calculate the position this object should have to negate the collision
+        const negatedPosition = this.position.subtract(overlapVector);
+        // calculate the difference (transformation) from current position to negated position
+        const negatedDiff = negatedPosition.subtract(this.position);
+
+        if (this.momentum.length > 0 && negatedDiff.length > 0) {
+            // bounce the momentum off the line of the collision object
+            this.momentum = this.momentum.bounceOffLine(negatedDiff.perpendicular2D());
+
+            // add extra drag
+            if (this.momentum.length !== 0) {
+                this.momentum = this.momentum.subtractLength(this.collisionDrag);
+            }
+        }
+
+        // move the ball outside of the wall
+        this.position = negatedPosition;
+
+        if(collider.hasTag('breakable')) {
+            const wall = <BreakableWall>collider.owner;
+            wall.hit();
+        }
+    }
+
+    private handleBallCollision(collider: ICollider, data: ICollisionData) {
+        // get the overlap into a vector
+        const overlapVector = Vector.fromPoint(data.overlapV);
+        // calculate the position this object should have to negate the collision
+        const negatedPosition = this.position.subtract(overlapVector);
+        // calculate the difference (transformation) from current position to negated position
+        const negatedDiff = negatedPosition.subtract(this.position);
+
+        if (this.momentum.length > 0 && negatedDiff.length > 0) {
+            const startSpeed = this.momentum.length;
+            // bounce the momentum off the line of the collision object
+            let bounceOffVector = this.momentum.bounceOffLine(negatedDiff.perpendicular2D());
+
+            // add extra drag
+            if (this.momentum.length !== 0) {
+                this.momentum = this.momentum.divide(2).subtractLength(this.collisionDrag);
+                bounceOffVector = bounceOffVector.divide(2).subtractLength(this.collisionDrag);
+            }
+            // divide by two
+            this.momentum = this.momentum.add(bounceOffVector);
+            // add momentum to other ball
+            const otherBall = <Ball>collider.owner;
+            const otherBallExtraMomentum = negatedDiff.opposite().setLength(1).scale(startSpeed).subtractLength(this.collisionDrag);
+            otherBall.momentum = otherBall.momentum.add(otherBallExtraMomentum);
+            otherBall.hit = true;
+        }
+
+        // move the ball outside of the wall
+        this.position = negatedPosition;
+    }
+
+    private handlePointCollision(collider: ICollider) {
+        const point = <Point>collider.owner;
+        point.hit(this.owner!);
     }
 }

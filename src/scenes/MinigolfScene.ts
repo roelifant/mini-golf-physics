@@ -13,6 +13,7 @@ import { Level } from "../game/Level";
 import { ILevelBreakableWallObject, ILevelShapeObject, LevelObjectType } from "../contracts/Levels";
 import { Player } from "../game/Player";
 import { Ripple } from "../objects/Ripple";
+import { Point } from "../objects/Point";
 
 export class MiniGolfScene extends Scene {
     public key = 'minigolf';
@@ -22,21 +23,23 @@ export class MiniGolfScene extends Scene {
         return GameService.instance.players[this.turn-1];
     }
 
-    private balls: Array<Ball> = [];
     private level: Level;
     private floorContainer = new Container();
+    private pointContainer = new Container();
     private ballContainer = new Container();
     private wallContainer = new Container();
     private breakableWallContainer = new Container();
     private effectsContainer = new Container();
     private arrowContainer = new Container();
-    private spawns: Array<Vector> = [];
     private turn: number;
     private round: number;
     private currentSpawn: number = 0;
     private waitingForTurnToEnd: boolean = false;
     private gameObjects: Array<IGameObject> = [];
     private ripples: Array<Ripple> = [];
+    private points: Array<Point> = [];
+    private balls: Array<Ball> = [];
+    private spawns: Array<Vector> = [];
 
     constructor(level: Level) {
         super();
@@ -58,6 +61,7 @@ export class MiniGolfScene extends Scene {
 
         // set up
         this.add(this.floorContainer);
+        this.add(this.pointContainer);
         this.add(this.ballContainer);
         this.add(this.breakableWallContainer);
         this.add(this.wallContainer);
@@ -153,6 +157,13 @@ export class MiniGolfScene extends Scene {
                 continue;
             }
 
+            if (object.type === LevelObjectType.POINT) {
+                const point = new Point(Vector.fromPoint(object.position));
+                this.addGameObject(point, this.pointContainer);
+                this.points.push(point);
+                continue;
+            }
+
             if (object.type === LevelObjectType.SPAWN) {
                 this.spawns.push(Vector.fromPoint(object.position));
             }
@@ -161,7 +172,7 @@ export class MiniGolfScene extends Scene {
 
     private setupBallForPlayer(player: Player) {
         const ball = new Ball(this, this.spawns[this.currentSpawn].copy(), 20, player.color);
-        player.ball = ball;
+        player.assignBall(ball);
         this.addGameObject(ball, this.ballContainer);
         this.arrowContainer.addChild(ball.arrowContainer);
         this.balls.push(ball);

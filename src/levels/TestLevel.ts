@@ -109,4 +109,28 @@ export const testLevel = new Level('test', LevelSize.SMALL, [
         type: LevelObjectType.SPAWN,
         position: {x: 0, y: 0},
     },
+    {
+        type: LevelObjectType.POINT,
+        position: {x: 300, y: 0}
+    },
+    {
+        type: LevelObjectType.POINT,
+        position: {x: -300, y: 0}
+    },
+    {
+        type: LevelObjectType.POINT,
+        position: {x: -220, y: -120}
+    },
+    {
+        type: LevelObjectType.POINT,
+        position: {x: 220, y: -120}
+    },
+    {
+        type: LevelObjectType.POINT,
+        position: {x: 220, y: 120}
+    },
+    {
+        type: LevelObjectType.POINT,
+        position: {x: -220, y: 120}
+    }
 ]);

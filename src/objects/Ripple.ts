@@ -40,7 +40,6 @@ export class Ripple implements IActiveGameObject{
                 width: width
             });
         this.visuals.alpha = opacity;
-        console.log(width);
     }
 
     public isActive(): this is IActiveGameObject {

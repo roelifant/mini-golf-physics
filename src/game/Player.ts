@@ -11,4 +11,9 @@ export class Player {
         this.color = color;
         this.points = 0;
     }
+
+    public assignBall(ball: Ball) {
+        this.ball = ball;
+        this.ball.owner = this;
+    }
 }
