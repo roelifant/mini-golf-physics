@@ -79,17 +79,19 @@ export class GameService {
     }
 
     public nextLevel() {
-        for (const player of this.players) {
-            player.ball = undefined;
-        }
-        if(this.currentLevel === this.levelScenes.length-1) {
-            const winner = this.players.sort((a, b) => b.points - a.points)[0];
-            alert(winner.name + ' won!');
-            PixiManager.endScene(this.levelScenes[this.currentLevel].key);
-            return;
-        }
-        this.currentLevel++;
-        PixiManager.changeScene(this.levelScenes[this.currentLevel].key);
+        setTimeout(() => {
+            for (const player of this.players) {
+                player.ball = undefined;
+            }
+            if(this.currentLevel === this.levelScenes.length-1) {
+                const winner = this.players.sort((a, b) => b.points - a.points)[0];
+                alert(winner.name + ' won!');
+                PixiManager.endScene(this.levelScenes[this.currentLevel].key);
+                return;
+            }
+            this.currentLevel++;
+            PixiManager.changeScene(this.levelScenes[this.currentLevel].key);
+        }, 1000);
     }
 
     private setupPlayers(count: number): void {

@@ -155,14 +155,13 @@ export class Ball implements IActiveGameObject, ITriggerGameObject {
             this.position = this.position.moveTowards(this.holeVanishingPoint, this.momentum.scale(deltaTime).length);
 
             if(
-                this.position.isNear(this.holeVanishingPoint, 5) &&
+                (this.position.matches(this.holeVanishingPoint) || this.position.isNear(this.holeVanishingPoint, 5)) &&
                 this.hasBeenLaunched &&
                 this.controlling
             ) {
                 this.visuals.alpha = 0;
                 this.endTurn();
                 return;
-            
             }
             const distance = this.position.distance(this.holeVanishingPoint);
             const maxDistance = 45;

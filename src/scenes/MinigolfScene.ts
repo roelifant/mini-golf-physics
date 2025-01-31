@@ -74,6 +74,7 @@ export class MiniGolfScene extends Scene {
         this.buildLevel();
 
         // controls
+        MouseListener.clearClickHandlers();
         MouseListener.registerClickHandler((event: IMouseListenerClickEvent) => {
             const ball = this.currentPlayer.ball;
             if(!ball) {
@@ -129,6 +130,15 @@ export class MiniGolfScene extends Scene {
             this.points = this.points.filter(point => point.claimed);
             // spawn hole there
             this.addGameObject(new Hole(position, 2), this.holeContainer);
+        }
+
+        // camera follow
+        if(!!this.currentPlayer.ball) {
+            const cameraPosition = Vector.fromPoint(this.stage.center);
+            const ballPosition = this.currentPlayer.ball.position;
+            const distance = cameraPosition.distance(ballPosition);
+            const newPosition = cameraPosition.moveTowards(ballPosition, (distance / (80*(1/this.scale))));
+            this.stage.moveCenter(newPosition.x, newPosition.y);
         }
     }
 
@@ -236,6 +246,10 @@ export class MiniGolfScene extends Scene {
             throw new Error('there is no ball');
         }
         ball.control();
+        this.stage.animate({
+            position: ball.position,
+            scale: .7
+        });
     }
 
     private endTurn() {
