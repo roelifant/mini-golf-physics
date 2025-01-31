@@ -59,7 +59,6 @@ export class Level {
                         newPointPosition = newPointPosition.add(originalPosition);
                         const newPoint = <ICurveablePoint>newPointPosition.toPoint();
                         newPoint.control = control;
-                        console.log(newPoint);
                         newPoints.push(newPoint);
                     }
                     shape.points = <Array<ICurveablePoint>>newPoints;

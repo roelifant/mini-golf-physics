@@ -6,6 +6,7 @@ export enum LevelObjectType {
     BREAKABLE_WALL = 'breakable-wall',
     FLOOR = 'floor',
     POINT = 'point',
+    HOLE = 'hole',
     SPAWN = 'spawn',
 }
 

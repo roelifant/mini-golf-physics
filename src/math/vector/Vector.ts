@@ -518,11 +518,12 @@ export class Vector {
      * @param distance 
      * @returns boolean
      */
-    public isNear(vector: Vector, distance: number): boolean {
+    public isNear(vector: Vector, distance: number, accuray: number = 3): boolean {
         if (this.dimensions !== 2 || vector.dimensions !== 2) {
             throw new DimensionsVectorError('This method only works for two-dimensional vectors!');
         }
-        return vector.distance(this) <= distance;
+        const proximity = vector.roundComponentsToNDecimals(accuray).distance(this.roundComponentsToNDecimals(accuray));
+        return proximity <= Vector.utils.roundToNDecimals(distance, accuray);
     }
 
     /**
@@ -862,5 +863,9 @@ export class Vector {
         const reflectionVector = new Vector((lineDirection.x * doubleDotProduct) - direction.x, (lineDirection.y * doubleDotProduct) - direction.y);
         // set the original length
         return reflectionVector.setLength(this.length);
+    }
+
+    public roundComponentsToNDecimals(N: number) {
+        return this.map((component: number) => Vector.utils.roundToNDecimals(component, N));
     }
 }

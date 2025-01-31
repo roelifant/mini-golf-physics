@@ -16,7 +16,7 @@ export class Point extends StaticShapeObject implements IActiveGameObject {
 
     constructor (position: Vector,) {
         const starShape = ShapeFactory.getPreset('star', 0.3);
-        super(starShape, position, 0);
+        super(starShape, position, 0, 0x6b6a6a);
         this.collider = new Collider(this, starShape, this.position, 0, ['point']);
         this.owner = null;
     }

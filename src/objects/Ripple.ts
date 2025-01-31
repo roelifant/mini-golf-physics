@@ -1,7 +1,7 @@
 import { Graphics } from "pixi.js";
 import { IActiveGameObject, ITriggerGameObject } from "../contracts/Objects";
 import { Vector } from "../math/vector/Vector";
-import { PixiManager } from "../pixi/PixiManager";
+import { GameService } from "../services/GameService";
 
 export class Ripple implements IActiveGameObject{
     public visuals: Graphics = new Graphics();
@@ -15,12 +15,12 @@ export class Ripple implements IActiveGameObject{
     constructor(position: Vector, color: number) {
         this.position = position;
         this.color = color;
-        this.startTime = PixiManager.scene?.sceneTime ?? 0;
+        this.startTime = GameService.instance.scene?.sceneTime ?? 0;
     }
 
     public update(_deltaTime: number): void {
         if(this.finished) return;
-        const ellapsedTime = PixiManager.scene?.sceneTime - this.startTime;
+        const ellapsedTime = GameService.instance.scene?.sceneTime - this.startTime;
         if(ellapsedTime > this.maxDuration) {
             this.finished = true;
             this.visuals.clear();

@@ -11,6 +11,7 @@ import { BreakableWall } from "./BreakableWall";
 import { MiniGolfScene } from "../scenes/MinigolfScene";
 import { Point } from "./Point";
 import { Player } from "../game/Player";
+import { Hole } from "./Hole";
 
 export class Ball implements IActiveGameObject, ITriggerGameObject {
     public visuals: Container<ContainerChild> | Graphics;
@@ -21,8 +22,9 @@ export class Ball implements IActiveGameObject, ITriggerGameObject {
     public angle: number = 0;
     public arrowContainer: Container = new Container();
     public color: number;
-    public hit = false;
+    public hit: boolean = false;
     public owner: Player|undefined;
+    public inHole: boolean = false;
 
     private timeToForce = 1200;
     private maxForce: number = 1.5;
@@ -30,6 +32,7 @@ export class Ball implements IActiveGameObject, ITriggerGameObject {
     private arrow: Graphics = new Graphics();
     private hasBeenLaunched: boolean = false;
     private controlling: boolean = false;
+    private holeVanishingPoint: Vector = Vector.empty();
 
     public get position(): Vector {
         return new Vector(this.visuals.position.x, this.visuals.position.y);
@@ -142,7 +145,34 @@ export class Ball implements IActiveGameObject, ITriggerGameObject {
 
     public update(deltaTime: number): void {
 
-        this.trail.angle += 1;
+        // drag
+        if(this.momentum.length !== 0) {
+            this.momentum = this.momentum.subtractLength(this.drag * deltaTime);
+        }
+
+        if(this.inHole) {
+            // get distance from hole center
+            this.position = this.position.moveTowards(this.holeVanishingPoint, this.momentum.scale(deltaTime).length);
+
+            if(
+                this.position.isNear(this.holeVanishingPoint, 5) &&
+                this.hasBeenLaunched &&
+                this.controlling
+            ) {
+                this.endTurn();
+                return;
+            
+            }
+            const distance = this.position.distance(this.holeVanishingPoint);
+            const maxDistance = 45;
+            const scale = (distance / maxDistance) + 0.3;
+            const opacity = (distance / maxDistance);
+            this.visuals.scale = scale;
+            this.visuals.alpha = opacity;
+
+            return;
+            
+        }
 
         this.position = this.position.add(this.momentum.scale(deltaTime));
 
@@ -154,18 +184,11 @@ export class Ball implements IActiveGameObject, ITriggerGameObject {
         }
         this.hideArrow();
 
-        // drag
-        if(this.momentum.length !== 0) {
-            this.momentum = this.momentum.subtractLength(this.drag * deltaTime);
-        }
-
         // end turn if needed
         if(this.momentum.length == 0){
             this.hit = false;
             if(this.hasBeenLaunched && this.controlling) {
-                this.controlling = false;
-                this.hasBeenLaunched = false;
-                (<MiniGolfScene>GameService.instance.scene).waitForTurnToEnd();
+                this.endTurn();
             }
         }
 
@@ -190,6 +213,11 @@ export class Ball implements IActiveGameObject, ITriggerGameObject {
 
         if(collider.hasTag('point') && this.momentum.length > 0) {
             this.handlePointCollision(collider);
+        }
+
+        if(collider.hasTag('hole') && (data.insideOther || data.overlap > 25) && !this.inHole) {
+            const hole = <Hole>collider.owner;
+            this.handleHole(hole);
         }
     }
 
@@ -320,5 +348,21 @@ export class Ball implements IActiveGameObject, ITriggerGameObject {
     private handlePointCollision(collider: ICollider) {
         const point = <Point>collider.owner;
         point.hit(this.owner!);
+    }
+
+    private handleHole(hole: Hole) {
+        hole.claim(this.owner!);
+        this.inHole = true;
+        this.holeVanishingPoint = this.position.reflectOverPoint(hole.position);
+        this.momentum = hole.position.subtract(this.holeVanishingPoint).setLength(this.momentum.length);
+        hole.position.log();
+        this.holeVanishingPoint.log();
+    }
+
+    private endTurn() {
+        this.momentum = Vector.empty();
+        this.controlling = false;
+        this.hasBeenLaunched = false;
+        (<MiniGolfScene>GameService.instance.scene).waitForTurnToEnd();
     }
 }

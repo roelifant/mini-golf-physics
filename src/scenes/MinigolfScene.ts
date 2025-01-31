@@ -14,6 +14,7 @@ import { ILevelBreakableWallObject, ILevelShapeObject, LevelObjectType } from ".
 import { Player } from "../game/Player";
 import { Ripple } from "../objects/Ripple";
 import { Point } from "../objects/Point";
+import { Hole } from "../objects/Hole";
 
 export class MiniGolfScene extends Scene {
     public key = 'minigolf';
@@ -25,6 +26,7 @@ export class MiniGolfScene extends Scene {
 
     private level: Level;
     private floorContainer = new Container();
+    private holeContainer = new Container();
     private pointContainer = new Container();
     private ballContainer = new Container();
     private wallContainer = new Container();
@@ -61,6 +63,7 @@ export class MiniGolfScene extends Scene {
 
         // set up
         this.add(this.floorContainer);
+        this.add(this.holeContainer);
         this.add(this.pointContainer);
         this.add(this.ballContainer);
         this.add(this.breakableWallContainer);
@@ -106,7 +109,14 @@ export class MiniGolfScene extends Scene {
         }
 
         // clear ripples
-        this.ripples = this.ripples.filter(ripple => !ripple.finished);
+        this.ripples = this.ripples.filter(ripple => {
+            if(ripple.finished) {
+                this.gameObjects = this.gameObjects.filter(object => object !== ripple);
+                return false;
+            }
+
+            return true;
+        });
     }
 
     public triggerRipple(position: Vector, color: number) {
@@ -166,6 +176,11 @@ export class MiniGolfScene extends Scene {
 
             if (object.type === LevelObjectType.SPAWN) {
                 this.spawns.push(Vector.fromPoint(object.position));
+                continue;
+            }
+
+            if (object.type === LevelObjectType.HOLE) {
+                this.addGameObject(new Hole(Vector.fromPoint(object.position), 2), this.holeContainer);
             }
         }
     }
