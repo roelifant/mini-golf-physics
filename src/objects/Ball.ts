@@ -97,7 +97,6 @@ export class Ball implements IActiveGameObject, ITriggerGameObject {
         this.trail.pivot.x = radius;
         this.trail.pivot.y = 0;
 
-
         // make arrow
         this.arrow
             .poly([
@@ -108,7 +107,6 @@ export class Ball implements IActiveGameObject, ITriggerGameObject {
             .fill(this.color);
         this.arrowContainer.addChild(this.arrow);
         this.arrowContainer.pivot.y = radius + 10;
-
 
         // combine visuals
         this.visuals = new Container;

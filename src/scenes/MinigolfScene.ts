@@ -12,6 +12,7 @@ import { BreakableWall } from "../objects/BreakableWall";
 import { Level } from "../game/Level";
 import { ILevelBreakableWallObject, ILevelShapeObject, LevelObjectType } from "../contracts/Levels";
 import { Player } from "../game/Player";
+import { Ripple } from "../objects/Ripple";
 
 export class MiniGolfScene extends Scene {
     public key = 'minigolf';
@@ -27,12 +28,15 @@ export class MiniGolfScene extends Scene {
     private ballContainer = new Container();
     private wallContainer = new Container();
     private breakableWallContainer = new Container();
+    private effectsContainer = new Container();
     private arrowContainer = new Container();
     private spawns: Array<Vector> = [];
     private turn: number;
     private round: number;
     private currentSpawn: number = 0;
     private waitingForTurnToEnd: boolean = false;
+    private gameObjects: Array<IGameObject> = [];
+    private ripples: Array<Ripple> = [];
 
     constructor(level: Level) {
         super();
@@ -57,6 +61,7 @@ export class MiniGolfScene extends Scene {
         this.add(this.ballContainer);
         this.add(this.breakableWallContainer);
         this.add(this.wallContainer);
+        this.add(this.effectsContainer);
         this.add(this.arrowContainer);
         this.buildLevel();
 
@@ -75,8 +80,10 @@ export class MiniGolfScene extends Scene {
     }
 
     public update(deltaTime: number) {
-        for (const ball of this.balls) {
-            ball.update(deltaTime);
+        for(const object of this.gameObjects) {
+            if(object.isActive()) {
+                object.update(deltaTime);
+            }
         }
         CollisionService.instance.update();
 
@@ -93,9 +100,19 @@ export class MiniGolfScene extends Scene {
                 this.endTurn();
             }
         }
+
+        // clear ripples
+        this.ripples = this.ripples.filter(ripple => !ripple.finished);
+    }
+
+    public triggerRipple(position: Vector, color: number) {
+        const ripple = new Ripple(position, color);
+        this.ripples.push(ripple);
+        this.addGameObject(ripple, this.effectsContainer);
     }
 
     private addGameObject(object: IGameObject, container: Container | null = null): void {
+        this.gameObjects.push(object);
         if (!!container) {
             container.addChild(object.visuals);
             return;
