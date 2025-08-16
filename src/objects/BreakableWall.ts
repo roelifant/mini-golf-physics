@@ -50,7 +50,7 @@ export class BreakableWall extends Wall implements IActiveGameObject {
 
         const alphaDiff = Math.abs(this.visuals.alpha - this.currentAlpha);
         
-        this.visuals.alpha -= alphaDiff / steps;
+        this.visuals.alpha -= alphaDiff / (steps-1);
         if(this.visuals.alpha < this.currentAlpha) {
             this.visuals.alpha = this.currentAlpha;
         }

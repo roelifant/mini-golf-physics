@@ -15,6 +15,7 @@ import { Player } from "../game/Player";
 import { Ripple } from "../objects/Ripple";
 import { Point } from "../objects/Point";
 import { Hole } from "../objects/Hole";
+import UIStore from "../stores/UIStore";
 
 export class MiniGolfScene extends Scene {
     public key: string;
@@ -137,8 +138,11 @@ export class MiniGolfScene extends Scene {
             const cameraPosition = Vector.fromPoint(this.stage.center);
             const ballPosition = this.currentPlayer.ball.position;
             const distance = cameraPosition.distance(ballPosition);
-            const newPosition = cameraPosition.moveTowards(ballPosition, (distance / (80*(1/this.scale))));
-            this.stage.moveCenter(newPosition.x, newPosition.y);
+
+            if(!cameraPosition.matches(ballPosition)) {
+                const newPosition = cameraPosition.moveTowards(ballPosition, (distance / (80*(1/this.scale))));
+                this.stage.moveCenter(newPosition.x, newPosition.y);
+            }
         }
     }
 
@@ -250,6 +254,7 @@ export class MiniGolfScene extends Scene {
             position: ball.position,
             scale: .7
         });
+        UIStore.state.playerName = player.name;
     }
 
     private endTurn() {
