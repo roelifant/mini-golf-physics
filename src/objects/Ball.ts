@@ -310,7 +310,7 @@ export class Ball implements IActiveGameObject, ITriggerGameObject {
 
         if(collider.hasTag('breakable')) {
             const wall = <BreakableWall>collider.owner;
-            wall.hit();
+            wall.hit(this.color);
         }
     }
 
