@@ -93,6 +93,16 @@ export class PixiManager {
 
         PixiManager.canvas = PixiManager.app.canvas;
 
+        // disable context menu
+        console.log('HERE');
+        console.log(PixiManager.canvas);
+        // PixiManager.canvas.addEventListener('onContextMenu', (event) => {
+        //     console.log('TEST');
+        //     event.preventDefault();
+        //     return false;
+        // });
+        PixiManager.canvas.oncontextmenu = () => false;
+
         // add scenes container to stage
         PixiManager.stage.addChild(PixiManager.sceneContainer);
 
